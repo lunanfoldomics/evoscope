@@ -1,2 +1,92 @@
 # evoscope
 Evoscope: a minimal agent-based multicellular simulation for emergent mesoscopic organization in dissipative environments
+# Evoscope
+
+**Evoscope** is a minimal agent-based multicellular simulation designed to study how **mesoscopic organization** can emerge from compact intracellular regulatory rules in a **dissipative environment**.
+
+The model combines:
+
+- heritable identity commitment
+- nutrient-dependent regulation
+- adhesion, motility, competition, and protection
+- local killing and space clearing
+- emergent multicellular morphologies
+- morphology-to-state inference through autoencoder-based latent representations
+
+Rather than modeling a specific organism, Evoscope provides a **minimal regulatory sandbox** for exploring how structured multicellular behaviors can arise from interpretable local rules.
+
+---
+
+## Concept
+
+Evoscope was developed to investigate a specific question:
+
+> Can a minimal multicellular system generate a biologically interpretable **mesoscopic level of organization** linking intracellular regulatory programs to transient colony-level structure?
+
+The simulation represents cells as agents on a **toroidal hexagonal lattice** coupled to a shared nutrient field. Each cell carries a minimal internal regulatory unit (the **genomoid**) whose state controls behavior such as:
+
+- nutrient uptake
+- adhesion / persistence
+- motility
+- competitive killing
+- protection from attack
+- commitment to heritable cluster identities
+
+These interactions generate structured colony dynamics including:
+
+- aggregate formation
+- territorial expansion
+- competition for space and resources
+- transient ecological niches
+- population collapse under energetic constraints
+
+---
+
+## Main features
+
+- 2D toroidal hexagonal grid
+- one cell per lattice site
+- diffusive extracellular nutrient field
+- intracellular energy bookkeeping
+- minimal gene/protein regulatory system
+- stochastic commitment to cluster identity
+- division, movement, attack, death, and nutrient recycling
+- ASCII rendering of simulation states
+- exportable outputs for downstream quantitative analysis
+- support for morphology-to-state learning with convolutional autoencoders
+
+---
+
+## Current model variables
+
+The current framework uses a compact set of functional variables:
+
+- **T1**: activator / nutrient-responsive regulator
+- **T2**: repressor / stress-crowding regulator
+- **I**: adhesion / integrin-like persistence program
+- **R**: nutrient uptake / receptor program
+- **M**: motility program
+- **K**: competitive killing program
+- **S**: protection / survival program
+- **H1-H3**: binary identity variables defining heritable cluster states
+
+These variables do **not** represent specific molecular pathways directly. They are intended as **minimal functional abstractions**.
+
+---
+
+## Repository structure
+
+A typical repository layout may look like this:
+
+```text
+evoscope/
+├── README.md
+├── LICENSE
+├── requirements.txt
+├── evoscope.py
+├── aggregate_evoscope_fig4.py
+├── paper/
+│   └── Evoscope_preprint.pdf
+├── examples/
+│   └── evoscope_ascii_frames_example.txt
+└── outputs/
