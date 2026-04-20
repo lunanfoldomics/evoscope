@@ -90,3 +90,62 @@ evoscope/
 ├── examples/
 │   └── evoscope_ascii_frames_example.txt
 └── outputs/
+```
+
+## Installation
+
+Clone the repository and install the required Python packages.
+
+```Bash
+git clone https://github.com/<your-username>/evoscope.git
+cd evoscope
+pip install -r requirements.txt
+```
+
+A minimal requirements.txt can include:
+
+```Bash
+numpy
+matplotlib
+pandas
+torch
+```
+
+If you only want to run the simulator and not the autoencoder analysis, torch is optional.
+
+## Running the simulation
+
+```Bash
+python evoscope.py
+```
+
+If argument parsing is enabled in your current version, a typical command may look like:
+
+```Bash
+python evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --initial_cells 30 --nutrient 6.9
+```
+
+Outputs may include:
+
+console summaries
+ASCII frame dumps
+snapshot arrays
+global gene trajectories
+cluster-resolved gene trajectories
+
+### Example output
+
+Typical simulation dynamics include:
+
+sparse exploratory cells
+early nucleation of committed clusters
+coexistence of multiple multicellular domains
+competitive reshaping of territorial interfaces
+fragmentation and collapse under energetic stress
+
+The system is intentionally minimal, but it often produces visually rich and interpretable multicellular behaviors.
+
+
+
+
+
