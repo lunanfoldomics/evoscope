@@ -1,3 +1,5 @@
+<img src="images/evoscope_logo.png" alt="logo" style="display:block; margin:auto; width:300px; height:auto;">
+
 # Evoscope
 a minimal agent-based multicellular simulation for emergent mesoscopic organization in dissipative environments
 
