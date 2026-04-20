@@ -157,5 +157,20 @@ The system is intentionally minimal, but it often produces visually rich and int
 
 
 
+### Multi-run aggregation
 
+The repository may include utilities for aggregating results across multiple seeds.
+
+For example:
+
+```Bash
+python aggregate_evoscope_fig4.py --root runs --outdir aggregated_outputs
+```
+This can be used to compute:
+
+mean ± standard deviation of global gene trajectories
+
+mean ± standard deviation of cluster-resolved gene trajectories
+
+multi-experiment summary figures
 
