@@ -1,6 +1,8 @@
 # Evoscope
 a minimal agent-based multicellular simulation for emergent mesoscopic organization in dissipative environments
 
+---
+
 **Evoscope** is a minimal agent-based multicellular simulation designed to study how **mesoscopic organization** can emerge from compact intracellular regulatory rules in a **dissipative environment**.
 
 The model combines:
