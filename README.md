@@ -75,24 +75,6 @@ These variables do **not** represent specific molecular pathways directly. They 
 
 ---
 
-## Repository structure
-
-A typical repository layout may look like this:
-
-```text
-evoscope/
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── evoscope.py
-├── aggregate_evoscope_fig4.py
-├── paper/
-│   └── Evoscope_preprint.pdf
-├── examples/
-│   └── evoscope_ascii_frames_example.txt
-└── outputs/
-```
-
 ## Installation
 
 Clone the repository and install the required Python packages.
@@ -128,29 +110,21 @@ python evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --initial_cells
 
 Outputs may include:
 
-console summaries
-
-ASCII frame dumps
-
-snapshot arrays
-
-global gene trajectories
-
-cluster-resolved gene trajectories
+- console summaries
+- ASCII frame dumps
+- snapshot arrays
+- global gene trajectories
+- cluster-resolved gene trajectories
 
 ### Example output
 
 Typical simulation dynamics include:
 
-sparse exploratory cells
-
-early nucleation of committed clusters
-
-coexistence of multiple multicellular domains
-
-competitive reshaping of territorial interfaces
-
-fragmentation and collapse under energetic stress
+-sparse exploratory cells
+-early nucleation of committed clusters
+-coexistence of multiple multicellular domains
+-competitive reshaping of territorial interfaces
+-fragmentation and collapse under energetic stress
 
 
 The system is intentionally minimal, but it often produces visually rich and interpretable multicellular behaviors.
@@ -166,11 +140,82 @@ For example:
 ```Bash
 python aggregate_evoscope_fig4.py --root runs --outdir aggregated_outputs
 ```
+
 This can be used to compute:
 
-mean ± standard deviation of global gene trajectories
+- mean ± standard deviation of global gene trajectories
+- mean ± standard deviation of cluster-resolved gene trajectories
+- multi-experiment summary figures
 
-mean ± standard deviation of cluster-resolved gene trajectories
+## Representation learning
 
-multi-experiment summary figures
+Evoscope also supports a morphology-to-state workflow in which simulation snapshots are used to train convolutional autoencoders with supervised prediction heads.
 
+The goal is to test whether:
+
+- visible morphology contains recoverable information about hidden internal states
+- latent variables can serve as mesoscopic coordinates linking internal regulatory dynamics to emergent multicellular form
+
+This part of the project is intended as a proof of concept for broader applications in:
+
+- digital pathology
+- spatial transcriptomics
+- synthetic morphogenesis
+- interpretable biological representation learning
+
+
+## Scientific context
+
+Evoscope builds on established traditions in:
+
+- agent-based multicellular modeling
+- minimal self-organizing systems
+- dissipative biological organization
+- artificial life
+- latent representation learning
+
+Its contribution is not to reproduce full biochemical realism, but to provide an original minimal integration of:
+
+- regulatory commitment
+- ecological interaction
+- dissipative multicellular dynamics
+- morphology-to-state inference
+
+tailored to the mesoscopic question.
+
+## Status
+
+This project is currently under active development.
+
+At present, Evoscope should be viewed as:
+
+- a research prototype
+- a conceptual and computational sandbox
+- a platform for testing mesoscopic hypotheses
+
+rather than a calibrated model of any specific tissue or organism.
+
+## Preprint
+
+A preprint describing the framework is planned / available as:
+
+Luca Zammataro. A Minimal Regulatory Spatial Model for Emergent Multicellular Organization in Dissipative Environments.
+
+Add bioRxiv link here once public.
+
+## Citation
+
+If you use this code, please cite the associated preprint once available.
+
+(A BibTeX entry will be added here after public release soon).
+
+## License
+
+MIT
+
+Add the corresponding LICENSE file before making the repository public.
+
+## Contact
+
+Luca Zammataro
+Add email / institutional affiliation / GitHub profile here if desired.
