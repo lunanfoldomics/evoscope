@@ -218,4 +218,4 @@ Add the corresponding LICENSE file before making the repository public.
 ## Contact
 
 Luca Zammataro
-Add email / institutional affiliation / GitHub profile here if desired.
+lucazammataro@lunanfoldomicsllc.com  - Lunan Foldomics LLC - github.com/lunanfoldomics
