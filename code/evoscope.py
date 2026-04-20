@@ -1,0 +1,1311 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from enum import Enum, auto
+import random
+from typing import Dict, List, Optional, Tuple, Union
+import argparse
+import csv
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+# ======================================================================================
+# Evoscope v1
+# Minimal hex-grid toroidal evo-devo sandbox
+#
+# Use: python evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --nutrient 6.0 --plot n
+# ======================================================================================
+
+
+class CellCyclePhase(Enum):
+    G = auto()
+    S = auto()
+    M = auto()
+    STALL = auto()
+
+
+class CommitmentState(Enum):
+    UNDETERMINED = auto()
+    COMMITTED = auto()
+    DECOMMITTED = auto()
+
+
+class ActionType(Enum):
+    NONE = auto()
+    REST = auto()
+    MOVE = auto()
+    DIVIDE = auto()
+    ATTACK_AND_DIVIDE = auto()
+
+
+@dataclass
+class Config:
+    width: int = 30
+    height: int = 20
+    seed: int = 7
+
+    # Initialization
+    initial_cells: int = 45
+    initial_medium_nutrient: float = 1.0
+    nutrient_hotspots: int = 0
+
+    # Nutrient dynamics
+    diffusion_rate: float = 0.12
+    nutrient_decay: float = 0.01
+    corpse_release_fraction: float = 0.75
+
+    # Energy dynamics
+    energy_init_min: float = 3.0
+    energy_init_max: float = 6.0
+    energy_max: float = 20.0
+    basal_cost: float = 0.08
+    protein_cost_factor: float = 0.006
+    movement_cost: float = 0.18
+    attack_cost: float = 0.35
+    division_cost: float = 0.9
+
+    # Cell cycle thresholds
+    s_entry_energy: float = 3.5
+    m_entry_energy: float = 5.5
+    divide_energy_min: float = 6.5
+    starvation_threshold: float = 0.8
+    critical_energy: float = 0.12
+    max_divisions: int = 14
+    max_age: int = 350
+    critical_epochs_before_death: int = 5
+
+    # Gene/protein dynamics
+    synth_rate_base: float = 0.18
+    degrade_rate: float = 0.10
+    max_protein_level: float = 5.0
+
+    # Commitment dynamics
+    commitment_stability_epochs: int = 4
+    decommit_stress_epochs: int = 8
+    decommit_probability: float = 0.08
+
+    # H bias map amplitude
+    h_bias_strength: float = 0.55
+
+    # Behavior scores
+    move_empty_bonus: float = 1.5
+    move_nutrient_weight: float = 0.9
+    move_crowding_penalty: float = 0.35
+    move_same_cluster_bonus: float = 0.25
+    move_diff_cluster_penalty: float = 0.20
+
+    divide_same_cluster_bonus: float = 0.50
+    divide_nutrient_weight: float = 0.40
+    divide_less_crowded_bonus: float = 0.25
+
+    attack_threshold: float = 0.5
+    mismatch_attack_bonus: float = 0.4
+
+    # Directional polarization dynamics
+    directional_noise: float = 0.03
+    empty_polarization_bonus: float = 0.45
+    occupied_polarization_bonus: float = 0.35
+    same_cluster_adhesion_bonus: float = 0.55
+    vulnerable_attack_bias: float = 0.60
+    daughter_polarity_noise: float = 0.04
+
+    snapshot_every: int = 1
+
+    verbose: bool = False
+
+
+@dataclass
+class PlannedAction:
+    action_type: ActionType = ActionType.NONE
+    source: Optional[Tuple[int, int]] = None
+    target: Optional[Tuple[int, int]] = None
+    attack_target: Optional[Tuple[int, int]] = None
+
+
+@dataclass
+class Cell:
+    cell_id: int
+    energy: float
+    age: int = 0
+    divisions_done: int = 0
+    phase: CellCyclePhase = CellCyclePhase.G
+    commitment: CommitmentState = CommitmentState.UNDETERMINED
+    cluster_id: Optional[int] = None  # 0..7 if committed
+
+    # Stress bookkeeping
+    low_energy_epochs: int = 0
+    stall_epochs: int = 0
+    stress_epochs: int = 0
+
+    # Commitment stabilization
+    candidate_cluster: Optional[int] = None
+    candidate_cluster_epochs: int = 0
+
+    # 10 proteins / genes
+    proteins: Dict[str, Union[float, List[float]]] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.proteins:
+            self.proteins = {
+                "T1": random.uniform(0.2, 1.2),
+                "T2": random.uniform(0.1, 0.8),
+                "I": self._random_directional_total(random.uniform(0.2, 1.0)),
+                "R": random.uniform(0.2, 1.0),
+                "M": self._random_directional_total(random.uniform(0.2, 1.0)),
+                "K": self._random_directional_total(random.uniform(0.1, 0.7)),
+                "S": random.uniform(0.1, 0.7),
+                "H1": random.choice([0.0, 1.0]),
+                "H2": random.choice([0.0, 1.0]),
+                "H3": random.choice([0.0, 1.0]),
+            }
+
+    @staticmethod
+    def _random_directional_total(total: float) -> List[float]:
+        weights = [random.uniform(0.2, 1.0) for _ in range(6)]
+        wsum = sum(weights) or 1.0
+        return [total * w / wsum for w in weights]
+
+    @staticmethod
+    def _halve_protein_value(value: Union[float, List[float]]) -> Union[float, List[float]]:
+        if isinstance(value, list):
+            return [v * 0.5 for v in value]
+        return value * 0.5
+
+    def copy_for_daughter(self, new_id: int, division_energy_fraction: float = 0.45) -> "Cell":
+        daughter_energy = self.energy * division_energy_fraction
+        self.energy *= (1.0 - division_energy_fraction)
+
+        daughter = Cell(
+            cell_id=new_id,
+            energy=daughter_energy,
+            age=0,
+            divisions_done=self.divisions_done + 1,
+            phase=CellCyclePhase.G,
+            commitment=self.commitment,
+            cluster_id=self.cluster_id,
+            low_energy_epochs=0,
+            stall_epochs=0,
+            stress_epochs=0,
+            candidate_cluster=self.candidate_cluster,
+            candidate_cluster_epochs=self.candidate_cluster_epochs,
+            proteins={k: self._halve_protein_value(v) for k, v in self.proteins.items()},
+        )
+
+        for k, v in list(self.proteins.items()):
+            self.proteins[k] = self._halve_protein_value(v)
+
+        for key in ("I", "M", "K"):
+            if isinstance(self.proteins[key], list):
+                self.proteins[key] = [max(0.0, x + random.uniform(-0.04, 0.04)) for x in self.proteins[key]]
+            if isinstance(daughter.proteins[key], list):
+                daughter.proteins[key] = [max(0.0, x + random.uniform(-0.04, 0.04)) for x in daughter.proteins[key]]
+
+        return daughter
+
+
+HEX_DIRECTIONS: List[Tuple[int, int]] = [
+    (1, 0),
+    (1, -1),
+    (0, -1),
+    (-1, 0),
+    (-1, 1),
+    (0, 1),
+]
+
+
+def clamp(x: float, lo: float, hi: float) -> float:
+    return max(lo, min(hi, x))
+
+
+def protein_total(value: Union[float, List[float]]) -> float:
+    return float(sum(value)) if isinstance(value, list) else float(value)
+
+
+def directional_value(value: Union[float, List[float]], direction_idx: int) -> float:
+    if isinstance(value, list):
+        return float(value[direction_idx])
+    return float(value)
+
+
+class ToroidalHexGrid:
+    def __init__(self, width: int, height: int):
+        self.width = width
+        self.height = height
+
+    def wrap(self, pos: Tuple[int, int]) -> Tuple[int, int]:
+        q, r = pos
+        return (q % self.width, r % self.height)
+
+    def neighbors(self, pos: Tuple[int, int]) -> List[Tuple[int, int]]:
+        q, r = pos
+        return [self.wrap((q + dq, r + dr)) for dq, dr in HEX_DIRECTIONS]
+
+    def iter_positions(self) -> List[Tuple[int, int]]:
+        return [(q, r) for r in range(self.height) for q in range(self.width)]
+
+
+class Evoscope:
+    def __init__(self, cfg: Config):
+        self.cfg = cfg
+        random.seed(cfg.seed)
+        
+        os.makedirs("snapshots", exist_ok=True)
+
+        self.grid = ToroidalHexGrid(cfg.width, cfg.height)
+        self.occupancy: Dict[Tuple[int, int], Cell] = {}
+        self.nutrient: Dict[Tuple[int, int], float] = {
+            pos: cfg.initial_medium_nutrient for pos in self.grid.iter_positions()
+        }
+
+        self.epoch = 0
+        self.next_cell_id = 1
+        self.metrics_history: List[Dict[str, float]] = []
+
+        self._seed_world()
+
+        # Gene History
+        self.gene_history = {
+            "T1": [],
+            "T2": [],
+            "I": [],
+            "R": [],
+            "M": [],
+            "K": [],
+            "S": []
+        }
+
+        self.cluster_gene_history = {
+            cid: {g: [] for g in ["T1","T2","I","R","M","K","S"]}
+            for cid in range(8)
+        }
+
+        self.cluster_size_history = {cid: [] for cid in range(8)}        
+
+
+    def _compute_global_expression(self):
+        totals = {k: 0.0 for k in self.gene_history.keys()}
+        n = len(self.occupancy)
+
+        if n == 0:
+            return {k: 0.0 for k in totals}
+
+        for cell in self.occupancy.values():
+            for k in totals:
+                value = cell.proteins.get(k, 0.0)
+                totals[k] += protein_total(value)
+
+        return {k: totals[k] / n for k in totals}
+
+
+    def _compute_cluster_expression(self):
+        # accumulo
+        totals = {
+            cid: {g: 0.0 for g in ["T1","T2","I","R","M","K","S"]}
+            for cid in range(8)
+        }
+        counts = {cid: 0 for cid in range(8)}
+
+        for cell in self.occupancy.values():
+            cid = cell.cluster_id
+            if cid is None:
+                continue
+
+            counts[cid] += 1
+
+            for g in totals[cid]:
+                value = cell.proteins.get(g, 0.0)
+                totals[cid][g] += protein_total(value)
+
+        # medie
+        means = {}
+        for cid in range(8):
+            if counts[cid] == 0:
+                means[cid] = {g: 0.0 for g in totals[cid]}
+            else:
+                means[cid] = {
+                    g: totals[cid][g] / counts[cid]
+                    for g in totals[cid]
+                }
+
+        return means, counts
+
+
+
+
+    def _seed_world(self) -> None:
+        positions = self.grid.iter_positions()
+        random.shuffle(positions)
+
+        for pos in positions[: self.cfg.initial_cells]:
+            cell = Cell(
+                cell_id=self.next_cell_id,
+                energy=random.uniform(self.cfg.energy_init_min, self.cfg.energy_init_max),
+            )
+            self.next_cell_id += 1
+            self.occupancy[pos] = cell
+
+        for _ in range(self.cfg.nutrient_hotspots):
+            pos = random.choice(positions)
+            self.nutrient[pos] += random.uniform(3.0, 7.0)
+
+    def run(self, epochs: int = 100) -> None:
+        for _ in range(epochs):
+            self.step()
+
+    def step(self) -> None:
+        self.epoch += 1
+
+        plans: Dict[Tuple[int, int], PlannedAction] = {}
+        dead_positions: List[Tuple[int, int]] = []
+
+        current_positions = list(self.occupancy.keys())
+        random.shuffle(current_positions)
+
+        for pos in current_positions:
+            cell = self.occupancy.get(pos)
+            if cell is None:
+                continue
+
+            context = self._sense(pos, cell)
+            self._update_regulation(cell, context)
+            self._update_energy(cell, pos)
+            self._update_cycle(cell)
+            self._update_commitment(cell, context)
+
+            if self._should_die(cell):
+                dead_positions.append(pos)
+                continue
+
+            plan = self._decide_action(pos, cell, context)
+            plans[pos] = plan
+
+        for pos in dead_positions:
+            self._kill_cell_at(pos, release=True)
+
+        self._apply_movements(plans)
+        self._apply_attack_and_divide(plans)
+        self._apply_divisions(plans)
+
+        self._diffuse_nutrient()
+        self._decay_nutrient()
+
+        self.metrics_history.append(self._compute_metrics())
+
+        # GLOBAL genes
+        expr = self._compute_global_expression()
+        for k in self.gene_history:
+            self.gene_history[k].append(expr[k])        
+
+        if self.cfg.verbose:
+            print(self.summary_line())
+
+        # CLUSTER genes
+        cluster_expr, cluster_counts = self._compute_cluster_expression()
+        for cid in range(8):
+            for g in self.cluster_gene_history[cid]:
+                self.cluster_gene_history[cid][g].append(cluster_expr[cid][g])
+
+            self.cluster_size_history[cid].append(cluster_counts[cid])
+
+        if self.epoch % 5 == 0:
+            #np.save(f"snapshots/grid_{self.epoch}.npy", grid_to_numpy(self))
+            np.save(f"snapshots/grid_{self.epoch:03d}.npy", grid_to_numpy(self))
+
+
+    def _sense(self, pos: Tuple[int, int], cell: Cell) -> Dict:
+        neighbors = self.grid.neighbors(pos)
+        same_cluster = 0
+        diff_cluster = 0
+        occupied = 0
+        local_nutrient = self.nutrient[pos]
+
+        neighbor_info = []
+        for dir_idx, npos in enumerate(neighbors):
+            ncell = self.occupancy.get(npos)
+            if ncell is not None:
+                occupied += 1
+                if cell.cluster_id is not None and ncell.cluster_id is not None:
+                    if cell.cluster_id == ncell.cluster_id:
+                        same_cluster += 1
+                    else:
+                        diff_cluster += 1
+
+            neighbor_info.append(
+                {
+                    "dir_idx": dir_idx,
+                    "pos": npos,
+                    "cell": ncell,
+                    "nutrient": self.nutrient[npos],
+                }
+            )
+
+        crowding = occupied / 6.0
+
+        return {
+            "neighbors": neighbor_info,
+            "local_nutrient": local_nutrient,
+            "crowding": crowding,
+            "same_cluster": same_cluster,
+            "diff_cluster": diff_cluster,
+        }
+
+    def _h_bias_profile(self, cluster_id: Optional[int]) -> Dict[str, float]:
+        if cluster_id is None:
+            return {"adh": 0.0, "mot": 0.0, "upt": 0.0, "agg": 0.0}
+
+        h1 = (cluster_id >> 2) & 1
+        h2 = (cluster_id >> 1) & 1
+        h3 = cluster_id & 1
+
+        s = self.cfg.h_bias_strength
+        return {
+            "adh": s * (1 if h1 else -1),
+            "mot": s * (1 if h2 else -1),
+            "agg": s * (1 if h3 else -1),
+            "upt": s * (1 if (h1 ^ h2) else -1),
+        }
+
+    def _directional_weights(self, weights: List[float]) -> List[float]:
+        adjusted = [max(0.01, w + random.uniform(0.0, self.cfg.directional_noise)) for w in weights]
+        total = sum(adjusted) or 1.0
+        return [w / total for w in adjusted]
+
+    def _redistribute_directional(self, total_amount: float, weights: List[float]) -> List[float]:
+        total_amount = clamp(total_amount, 0.0, self.cfg.max_protein_level)
+        norm = self._directional_weights(weights)
+        return [total_amount * w for w in norm]
+
+    def _dominant_direction(self, value: Union[float, List[float]]) -> int:
+        if isinstance(value, list):
+            return max(range(len(value)), key=lambda i: value[i])
+        return 0
+
+    def _direction_index(self, src: Tuple[int, int], target: Tuple[int, int]) -> Optional[int]:
+        for dir_idx, npos in enumerate(self.grid.neighbors(src)):
+            if npos == target:
+                return dir_idx
+        return None
+
+    def _update_regulation(self, cell: Cell, context: Dict) -> None:
+        p = cell.proteins
+        nutrient = context["local_nutrient"]
+        crowding = context["crowding"]
+        bias = self._h_bias_profile(cell.cluster_id)
+        neighbors = context["neighbors"]
+
+        t1_synth = self.cfg.synth_rate_base * (0.4 + nutrient / (1.0 + nutrient))
+        t2_synth = self.cfg.synth_rate_base * (
+            0.2 + crowding + (0.8 if cell.energy < self.cfg.starvation_threshold else 0.0)
+        )
+
+        p["T1"] = clamp(float(p["T1"]) + t1_synth - self.cfg.degrade_rate * float(p["T1"]), 0.0, self.cfg.max_protein_level)
+        p["T2"] = clamp(float(p["T2"]) + t2_synth - self.cfg.degrade_rate * float(p["T2"]), 0.0, self.cfg.max_protein_level)
+
+        transcription_drive = clamp(0.25 + 0.40 * float(p["T1"]) - 0.25 * float(p["T2"]), 0.0, 2.0)
+
+        m1_total = clamp(
+            protein_total(p["I"]) + self.cfg.synth_rate_base * (0.4 * transcription_drive + max(0.0, bias["adh"]))
+            - self.cfg.degrade_rate * protein_total(p["I"]),
+            0.0,
+            self.cfg.max_protein_level,
+        )
+        p["R"] = clamp(
+            float(p["R"]) + self.cfg.synth_rate_base * (0.4 * transcription_drive + max(0.0, bias["upt"]))
+            - self.cfg.degrade_rate * float(p["R"]),
+            0.0,
+            self.cfg.max_protein_level,
+        )
+        m_total = clamp(
+            protein_total(p["M"]) + self.cfg.synth_rate_base * (0.35 * transcription_drive + max(0.0, bias["mot"]))
+            - self.cfg.degrade_rate * protein_total(p["M"]),
+            0.0,
+            self.cfg.max_protein_level,
+        )
+        k_total = clamp(
+            protein_total(p["K"]) + self.cfg.synth_rate_base * (0.28 * transcription_drive + max(0.0, bias["agg"]))
+            - self.cfg.degrade_rate * protein_total(p["K"]),
+            0.0,
+            self.cfg.max_protein_level,
+        )
+        p["S"] = clamp(
+            float(p["S"]) + self.cfg.synth_rate_base * (0.28 * transcription_drive + 0.15 * crowding)
+            - self.cfg.degrade_rate * float(p["S"]),
+            0.0,
+            self.cfg.max_protein_level,
+        )
+
+        adh_weights: List[float] = []
+        mot_weights: List[float] = []
+        atk_weights: List[float] = []
+
+        for entry in neighbors:
+            dir_idx = entry["dir_idx"]
+            ncell = entry["cell"]
+            nutrient_here = entry["nutrient"]
+            if ncell is None:
+                adh_w = 0.08
+                mot_w = 1.0 + self.cfg.empty_polarization_bonus + 0.35 * nutrient_here + max(0.0, bias["mot"])
+                atk_w = 0.05
+            else:
+                same = (
+                    cell.cluster_id is not None
+                    and ncell.cluster_id is not None
+                    and cell.cluster_id == ncell.cluster_id
+                )
+                diff = (
+                    cell.cluster_id is not None
+                    and ncell.cluster_id is not None
+                    and cell.cluster_id != ncell.cluster_id
+                )
+                vulnerability = max(0.0, protein_total(p["K"]) - float(ncell.proteins["S"]))
+                adh_w = 0.20 + self.cfg.occupied_polarization_bonus + (self.cfg.same_cluster_adhesion_bonus if same else 0.0)
+                mot_w = 0.10 + (0.18 if diff else 0.0)
+                atk_w = 0.10 + self.cfg.occupied_polarization_bonus + self.cfg.vulnerable_attack_bias * vulnerability
+                if diff:
+                    atk_w += self.cfg.mismatch_attack_bonus
+            adh_weights.append(adh_w)
+            mot_weights.append(mot_w)
+            atk_weights.append(atk_w)
+
+        old_m1 = p["I"] if isinstance(p["I"], list) else [float(p["I"]) / 6.0] * 6
+        old_m = p["M"] if isinstance(p["M"], list) else [float(p["M"]) / 6.0] * 6
+        old_k = p["K"] if isinstance(p["K"], list) else [float(p["K"]) / 6.0] * 6
+
+        adh_weights = [0.60 * w + 0.40 * old_m1[i] for i, w in enumerate(adh_weights)]
+        mot_weights = [0.65 * w + 0.35 * old_m[i] for i, w in enumerate(mot_weights)]
+        atk_weights = [0.65 * w + 0.35 * old_k[i] for i, w in enumerate(atk_weights)]
+
+        p["I"] = self._redistribute_directional(m1_total, adh_weights)
+        p["M"] = self._redistribute_directional(m_total, mot_weights)
+        p["K"] = self._redistribute_directional(k_total, atk_weights)
+
+        if cell.commitment != CommitmentState.COMMITTED:
+            for hk in ("H1", "H2", "H3"):
+                pull = 0.12 * random.uniform(-1.0, 1.0) + 0.05 * transcription_drive
+                p[hk] = clamp(float(p[hk]) + pull - self.cfg.degrade_rate * 0.25 * float(p[hk]), 0.0, 1.0)
+        else:
+            cid = cell.cluster_id if cell.cluster_id is not None else 0
+            p["H1"] = float((cid >> 2) & 1)
+            p["H2"] = float((cid >> 1) & 1)
+            p["H3"] = float(cid & 1)
+
+    def _update_energy(self, cell: Cell, pos: Tuple[int, int]) -> None:
+        p = cell.proteins
+        uptake = self.nutrient[pos] * (0.10 + 0.18 * float(p["R"]))
+        uptake = min(uptake, self.nutrient[pos])
+        self.nutrient[pos] -= uptake
+
+        protein_load = sum(protein_total(v) for v in p.values())
+        cost = self.cfg.basal_cost + self.cfg.protein_cost_factor * protein_load
+
+        cell.energy = clamp(cell.energy + uptake - cost, 0.0, self.cfg.energy_max)
+
+        if cell.energy < self.cfg.starvation_threshold:
+            cell.low_energy_epochs += 1
+            cell.stress_epochs += 1
+        else:
+            cell.low_energy_epochs = max(0, cell.low_energy_epochs - 1)
+            cell.stress_epochs = max(0, cell.stress_epochs - 1)
+
+    def _update_cycle(self, cell: Cell) -> None:
+        cell.age += 1
+
+        if cell.phase == CellCyclePhase.G:
+            if cell.energy >= self.cfg.s_entry_energy:
+                cell.phase = CellCyclePhase.S
+        elif cell.phase == CellCyclePhase.S:
+            if cell.energy >= self.cfg.m_entry_energy:
+                cell.phase = CellCyclePhase.M
+        elif cell.phase == CellCyclePhase.M:
+            pass
+        elif cell.phase == CellCyclePhase.STALL:
+            if cell.energy >= self.cfg.s_entry_energy:
+                cell.phase = CellCyclePhase.S
+                cell.stall_epochs = 0
+
+    def _update_commitment(self, cell: Cell, context: Dict) -> None:
+        p = cell.proteins
+
+        if cell.commitment == CommitmentState.UNDETERMINED:
+            candidate = (
+                ((1 if p["H1"] >= 0.5 else 0) << 2)
+                | ((1 if p["H2"] >= 0.5 else 0) << 1)
+                | (1 if p["H3"] >= 0.5 else 0)
+            )
+
+            if cell.candidate_cluster == candidate:
+                cell.candidate_cluster_epochs += 1
+            else:
+                cell.candidate_cluster = candidate
+                cell.candidate_cluster_epochs = 1
+
+            if cell.candidate_cluster_epochs >= self.cfg.commitment_stability_epochs:
+                cell.commitment = CommitmentState.COMMITTED
+                cell.cluster_id = candidate
+
+        elif cell.commitment == CommitmentState.COMMITTED:
+            if cell.stress_epochs >= self.cfg.decommit_stress_epochs:
+                if random.random() < self.cfg.decommit_probability:
+                    cell.commitment = CommitmentState.DECOMMITTED
+                    cell.cluster_id = None
+                    cell.candidate_cluster = None
+                    cell.candidate_cluster_epochs = 0
+
+        elif cell.commitment == CommitmentState.DECOMMITTED:
+            if cell.energy > self.cfg.s_entry_energy:
+                cell.commitment = CommitmentState.UNDETERMINED
+
+    def _should_die(self, cell: Cell) -> bool:
+        if cell.energy <= self.cfg.critical_energy and cell.low_energy_epochs >= self.cfg.critical_epochs_before_death:
+            return True
+        if cell.divisions_done >= self.cfg.max_divisions:
+            return True
+        if cell.age >= self.cfg.max_age:
+            return True
+        return False
+
+    def _decide_action(self, pos: Tuple[int, int], cell: Cell, context: Dict) -> PlannedAction:
+        neighbors = context["neighbors"]
+        empty_neighbors = [n for n in neighbors if n["cell"] is None]
+
+        if cell.phase == CellCyclePhase.M and cell.energy >= self.cfg.divide_energy_min:
+            if empty_neighbors:
+                target = self._choose_division_target(cell, empty_neighbors)
+                return PlannedAction(ActionType.DIVIDE, source=pos, target=target)
+            attack_target = self._choose_attack_target(cell, neighbors)
+            if attack_target is not None:
+                return PlannedAction(ActionType.ATTACK_AND_DIVIDE, source=pos, target=attack_target, attack_target=attack_target)
+            cell.phase = CellCyclePhase.STALL
+            cell.stall_epochs += 1
+            return PlannedAction(ActionType.REST, source=pos)
+
+        move_target = self._choose_move_target(cell, neighbors)
+        if move_target is not None:
+            return PlannedAction(ActionType.MOVE, source=pos, target=move_target)
+
+        return PlannedAction(ActionType.REST, source=pos)
+
+    def _choose_division_target(self, cell: Cell, empty_neighbors: List[Dict]) -> Tuple[int, int]:
+        best_score = -1e9
+        best_pos = empty_neighbors[0]["pos"]
+
+        for entry in empty_neighbors:
+            npos = entry["pos"]
+            dir_idx = entry["dir_idx"]
+            nutrient = entry["nutrient"]
+            crowd = self._local_crowding(npos)
+            same_bonus = self._same_cluster_count_around(cell.cluster_id, npos) * self.cfg.divide_same_cluster_bonus
+            score = (
+                self.cfg.divide_nutrient_weight * nutrient
+                + same_bonus
+                + self.cfg.divide_less_crowded_bonus * (1.0 - crowd)
+                + 0.55 * directional_value(cell.proteins["M"], dir_idx)
+                - 0.20 * directional_value(cell.proteins["I"], dir_idx)
+                + random.uniform(-0.05, 0.05)
+            )
+            if score > best_score:
+                best_score = score
+                best_pos = npos
+
+        return best_pos
+
+    def _choose_move_target(self, cell: Cell, neighbors: List[Dict]) -> Optional[Tuple[int, int]]:
+        stay_pressure = 0.55 * protein_total(cell.proteins["I"]) - 0.35 * protein_total(cell.proteins["M"])
+        if stay_pressure > random.uniform(0.1, 1.4):
+            return None
+
+        candidates = [n for n in neighbors if n["cell"] is None]
+        if not candidates:
+            return None
+
+        best_score = -1e9
+        best_pos: Optional[Tuple[int, int]] = None
+
+        for entry in candidates:
+            npos = entry["pos"]
+            dir_idx = entry["dir_idx"]
+            nutrient = entry["nutrient"]
+            crowd = self._local_crowding(npos)
+            same = self._same_cluster_count_around(cell.cluster_id, npos)
+            diff = self._diff_cluster_count_around(cell.cluster_id, npos)
+            m_dir = directional_value(cell.proteins["M"], dir_idx)
+            m1_dir = directional_value(cell.proteins["I"], dir_idx)
+
+            score = (
+                self.cfg.move_empty_bonus
+                + self.cfg.move_nutrient_weight * nutrient
+                - self.cfg.move_crowding_penalty * crowd
+                + self.cfg.move_same_cluster_bonus * same
+                - self.cfg.move_diff_cluster_penalty * diff
+                + 0.80 * m_dir
+                - 0.35 * m1_dir
+                + random.uniform(-0.08, 0.08)
+            )
+            if score > best_score:
+                best_score = score
+                best_pos = npos
+
+        return best_pos
+
+    def _choose_attack_target(self, cell: Cell, neighbors: List[Dict]) -> Optional[Tuple[int, int]]:
+        best_score = -1e9
+        best_target = None
+
+        for entry in neighbors:
+            ncell = entry["cell"]
+            if ncell is None:
+                continue
+
+            dir_idx = entry["dir_idx"]
+            mismatch_bonus = 0.0
+            if cell.cluster_id is not None and ncell.cluster_id is not None and cell.cluster_id != ncell.cluster_id:
+                mismatch_bonus = self.cfg.mismatch_attack_bonus
+
+            score = (
+                directional_value(cell.proteins["K"], dir_idx)
+                - float(ncell.proteins["S"])
+                + mismatch_bonus
+                + 0.15 * directional_value(cell.proteins["M"], dir_idx)
+                + random.uniform(-0.05, 0.05)
+            )
+            if score > best_score:
+                best_score = score
+                best_target = entry["pos"]
+
+        if best_score >= self.cfg.attack_threshold:
+            return best_target
+        return None
+
+    def _apply_movements(self, plans: Dict[Tuple[int, int], PlannedAction]) -> None:
+        move_requests: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}
+
+        for src, plan in plans.items():
+            if plan.action_type == ActionType.MOVE and plan.target is not None:
+                if src in self.occupancy and plan.target not in self.occupancy:
+                    move_requests.setdefault(plan.target, []).append(src)
+
+        for target, sources in move_requests.items():
+            winner_src = random.choice(sources)
+            if winner_src not in self.occupancy or target in self.occupancy:
+                continue
+
+            cell = self.occupancy.pop(winner_src)
+            cell.energy = max(0.0, cell.energy - self.cfg.movement_cost)
+            self.occupancy[target] = cell
+
+    def _apply_attack_and_divide(self, plans: Dict[Tuple[int, int], PlannedAction]) -> None:
+        requests: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}
+
+        for src, plan in plans.items():
+            if plan.action_type == ActionType.ATTACK_AND_DIVIDE and plan.attack_target is not None:
+                if src in self.occupancy:
+                    requests.setdefault(plan.attack_target, []).append(src)
+
+        for target, attackers in requests.items():
+            defender = self.occupancy.get(target)
+            if defender is None:
+                continue
+
+            winner_src = self._choose_best_attacker(target, attackers)
+            if winner_src is None or winner_src not in self.occupancy:
+                continue
+
+            attacker = self.occupancy[winner_src]
+            dir_idx = self._direction_index(winner_src, target)
+            if dir_idx is None:
+                continue
+
+            attack_strength = directional_value(attacker.proteins["K"], dir_idx) - float(defender.proteins["S"])
+            if attacker.cluster_id is not None and defender.cluster_id is not None and attacker.cluster_id != defender.cluster_id:
+                attack_strength += self.cfg.mismatch_attack_bonus
+            attack_strength += 0.15 * directional_value(attacker.proteins["M"], dir_idx)
+
+            if attack_strength >= self.cfg.attack_threshold and attacker.energy >= (self.cfg.attack_cost + self.cfg.division_cost):
+                attacker.energy -= self.cfg.attack_cost
+                self._kill_cell_at(target, release=True)
+
+                daughter = attacker.copy_for_daughter(self.next_cell_id)
+                self.next_cell_id += 1
+
+                attacker.energy = max(0.0, attacker.energy - self.cfg.division_cost)
+                attacker.phase = CellCyclePhase.G
+                attacker.divisions_done += 1
+                self.occupancy[target] = daughter
+
+
+    def _apply_divisions(self, plans: Dict[Tuple[int, int], PlannedAction]) -> None:
+        requests: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}
+
+        for src, plan in plans.items():
+            if plan.action_type == ActionType.DIVIDE and plan.target is not None:
+                if src in self.occupancy and plan.target not in self.occupancy:
+                    requests.setdefault(plan.target, []).append(src)
+
+        for target, sources in requests.items():
+            winner_src = random.choice(sources)
+            if winner_src not in self.occupancy or target in self.occupancy:
+                continue
+
+            mother = self.occupancy[winner_src]
+            if mother.energy < self.cfg.division_cost:
+                continue
+
+            daughter = mother.copy_for_daughter(self.next_cell_id)
+            self.next_cell_id += 1
+
+            mother.energy = max(0.0, mother.energy - self.cfg.division_cost)
+            mother.phase = CellCyclePhase.G
+            mother.divisions_done += 1
+            self.occupancy[target] = daughter
+
+    def _choose_best_attacker(self, target: Tuple[int, int], attackers: List[Tuple[int, int]]) -> Optional[Tuple[int, int]]:
+        best_src = None
+        best_score = -1e9
+        defender = self.occupancy.get(target)
+        if defender is None:
+            return None
+
+        for src in attackers:
+            attacker = self.occupancy.get(src)
+            if attacker is None:
+                continue
+            dir_idx = self._direction_index(src, target)
+            if dir_idx is None:
+                continue
+            score = directional_value(attacker.proteins["K"], dir_idx) - float(defender.proteins["S"]) + random.uniform(-0.05, 0.05)
+            score += 0.15 * directional_value(attacker.proteins["M"], dir_idx)
+            if attacker.cluster_id is not None and defender.cluster_id is not None and attacker.cluster_id != defender.cluster_id:
+                score += self.cfg.mismatch_attack_bonus
+            if score > best_score:
+                best_score = score
+                best_src = src
+
+        return best_src
+
+    def _kill_cell_at(self, pos: Tuple[int, int], release: bool = True) -> None:
+        cell = self.occupancy.pop(pos, None)
+        if cell is None:
+            return
+        if release:
+            release_amount = self.cfg.corpse_release_fraction * cell.energy
+            self.nutrient[pos] += release_amount
+
+    def _diffuse_nutrient(self) -> None:
+        new_field = dict(self.nutrient)
+        for pos in self.grid.iter_positions():
+            current = self.nutrient[pos]
+            neigh = self.grid.neighbors(pos)
+            neigh_mean = sum(self.nutrient[np] for np in neigh) / 6.0
+            new_field[pos] = current + self.cfg.diffusion_rate * (neigh_mean - current)
+        self.nutrient = new_field
+
+    def _decay_nutrient(self) -> None:
+        for pos in self.nutrient:
+            self.nutrient[pos] = max(0.0, self.nutrient[pos] * (1.0 - self.cfg.nutrient_decay))
+
+    def _local_crowding(self, pos: Tuple[int, int]) -> float:
+        occ = sum(1 for np in self.grid.neighbors(pos) if np in self.occupancy)
+        return occ / 6.0
+
+    def _same_cluster_count_around(self, cluster_id: Optional[int], pos: Tuple[int, int]) -> int:
+        if cluster_id is None:
+            return 0
+
+        count = 0
+        for np in self.grid.neighbors(pos):
+            c = self.occupancy.get(np)
+            if c is not None and c.cluster_id == cluster_id:
+                count += 1
+        return count
+
+    def _diff_cluster_count_around(self, cluster_id: Optional[int], pos: Tuple[int, int]) -> int:
+        if cluster_id is None:
+            return 0
+
+        count = 0
+        for np in self.grid.neighbors(pos):
+            c = self.occupancy.get(np)
+            if c is not None and c.cluster_id is not None and c.cluster_id != cluster_id:
+                count += 1
+        return count
+
+    def _compute_metrics(self) -> Dict[str, float]:
+        alive = len(self.occupancy)
+        total_energy = sum(c.energy for c in self.occupancy.values())
+        mean_energy = total_energy / alive if alive else 0.0
+        medium_nutrient = sum(self.nutrient.values())
+
+        committed = sum(1 for c in self.occupancy.values() if c.commitment == CommitmentState.COMMITTED)
+        clusters: Dict[int, int] = {}
+        for c in self.occupancy.values():
+            if c.cluster_id is not None:
+                clusters[c.cluster_id] = clusters.get(c.cluster_id, 0) + 1
+
+        return {
+            "epoch": float(self.epoch),
+            "alive": float(alive),
+            "mean_energy": mean_energy,
+            "medium_nutrient": medium_nutrient,
+            "committed": float(committed),
+            "n_clusters_present": float(len(clusters)),
+            "largest_cluster": float(max(clusters.values()) if clusters else 0),
+        }
+
+    def summary_line(self) -> str:
+        m = self.metrics_history[-1] if self.metrics_history else self._compute_metrics()
+        return (
+            f"epoch={int(m['epoch'])} alive={int(m['alive'])} committed={int(m['committed'])} "
+            f"clusters={int(m['n_clusters_present'])} largest={int(m['largest_cluster'])} "
+            f"meanE={m['mean_energy']:.2f} mediumN={m['medium_nutrient']:.2f}"
+        )
+
+
+
+
+    def ascii_snapshot(self, colored: bool = False, block_style: bool = True) -> str:
+        rows = []
+
+        reset = "\033[0m"
+
+        # foreground (testo)
+        fg_dark = "\033[30m"   # nero
+        fg_light = "\033[97m"  # bianco brillante
+
+        # background per cluster
+        bg_map = {
+            None: "\033[47m",   # undetermined: sfondo bianco/grigio
+            0: "\033[41m",      # rosso
+            1: "\033[42m",      # verde
+            2: "\033[43m",      # giallo
+            3: "\033[44m",      # blu
+            4: "\033[45m",      # magenta
+            5: "\033[46m",      # cyan
+            6: "\033[107m",     # bianco brillante
+            7: "\033[100m",     # grigio scuro
+        }
+
+        # per scegliere testo nero o bianco a seconda dello sfondo
+        dark_text_clusters = {2, 5, 6, None}   # giallo, cyan, bianco, undetermined
+
+        for r in range(self.cfg.height):
+            prefix = " " if r % 2 else ""
+            chars = []
+
+            for q in range(self.cfg.width):
+                c = self.occupancy.get((q, r))
+
+                if c is None:
+                    chars.append(" . ")
+                elif c.cluster_id is None:
+                    symbol = "u"
+                    if colored:
+                        fg = fg_dark if None in dark_text_clusters else fg_light
+                        if block_style:
+                            chars.append(f"{bg_map[None]}{fg} {symbol} {reset}")
+                        else:
+                            chars.append(f"{bg_map[None]}{fg}[{symbol}]{reset}")
+                    else:
+                        chars.append(f" {symbol} ")
+                else:
+                    cid = c.cluster_id
+                    symbol = hex(cid)[-1]
+                    if colored:
+                        fg = fg_dark if cid in dark_text_clusters else fg_light
+                        if block_style:
+                            chars.append(f"{bg_map[cid]}{fg} {symbol} {reset}")
+                        else:
+                            chars.append(f"{bg_map[cid]}{fg}[{symbol}]{reset}")
+                    else:
+                        chars.append(f" {symbol} ")
+
+            rows.append(prefix + "".join(chars))
+
+        return "\n".join(rows)
+
+
+    def ascii_legend(self, colored: bool = False, block_style: bool = True) -> str:
+        reset = "\033[0m"
+        fg_dark = "\033[30m"
+        fg_light = "\033[97m"
+
+        bg_map = {
+            None: "\033[47m",
+            0: "\033[41m",
+            1: "\033[42m",
+            2: "\033[43m",
+            3: "\033[44m",
+            4: "\033[45m",
+            5: "\033[46m",
+            6: "\033[107m",
+            7: "\033[100m",
+        }
+
+        dark_text_clusters = {2, 5, 6, None}
+
+        def tile(symbol: str, cid):
+            if not colored:
+                return f"[{symbol}]"
+            fg = fg_dark if cid in dark_text_clusters else fg_light
+            if block_style:
+                return f"{bg_map[cid]}{fg} {symbol} {reset}"
+            return f"{bg_map[cid]}{fg}[{symbol}]{reset}"
+
+        parts = [". = empty", f"{tile('u', None)} = undetermined"]
+        for i in range(8):
+            parts.append(f"{tile(hex(i)[-1], i)} = cluster {i}")
+        return " | ".join(parts)
+
+
+    def frame_with_header(self, colored: bool = False) -> str:
+        return f"{self.summary_line()}\n{self.ascii_legend(colored=colored)}\n{self.ascii_snapshot(colored=colored)}"
+
+    def collect_ascii_frames(self, every: int = 1, include_initial: bool = True, colored: bool = False) -> List[str]:
+        frames: List[str] = []
+
+        if include_initial:
+            frames.append(
+                f"epoch=0 alive={len(self.occupancy)}\n"
+                f"{self.ascii_legend(colored=colored)}\n"
+                f"{self.ascii_snapshot(colored=colored)}"
+            )
+
+        if every <= 0:
+            every = 1
+
+        if self.metrics_history:
+            frames.append(self.frame_with_header(colored=colored))
+
+        return frames
+
+    def run_with_ascii_frames(
+        self,
+        epochs: int = 100,
+        every: int = 1,
+        include_initial: bool = True,
+        clear_screen: bool = False,
+        pause: float = 0.0,
+        colored: bool = True,
+    ) -> List[str]:
+        import time
+
+        if every <= 0:
+            every = 1
+
+        frames: List[str] = []
+
+        if include_initial:
+            frame0 = (
+                f"epoch=0 alive={len(self.occupancy)}\n"
+                f"{self.ascii_legend(colored=colored)}\n"
+                f"{self.ascii_snapshot(colored=colored)}"
+            )
+            frames.append(frame0)
+
+            if clear_screen:
+                print("\033[2J\033[H" + frame0, flush=True)
+                if pause > 0:
+                    time.sleep(pause)
+
+        for _ in range(epochs):
+            self.step()
+            #if self.epoch % every == 0:
+            if self.epoch % self.cfg.snapshot_every == 0:    
+                frame = self.frame_with_header(colored=colored)
+                frames.append(frame)
+
+                if clear_screen:
+                    print("\033[2J\033[H" + frame, flush=True)
+                    if pause > 0:
+                        time.sleep(pause)
+
+        return frames
+
+    def save_ascii_frames(self, path: str, frames: List[str]) -> None:
+        with open(path, "w", encoding="utf-8") as f:
+            for i, frame in enumerate(frames):
+                f.write(frame)
+                if i < len(frames) - 1:
+                    f.write("\n\n" + ("=" * 80) + "\n\n")
+
+
+
+
+
+def plot_genes(sim):
+    plt.figure(figsize=(14,8))
+
+    for gene, values in sim.gene_history.items():
+        plt.plot(
+            values,
+            label=gene,
+            linewidth=4.5   # <-- SPESSORE CURVA
+        )
+
+    plt.xlabel("Simulation step", fontsize=20)
+    plt.ylabel("Mean expression", fontsize=20)
+    plt.title("Global gene dynamics", fontsize=24)
+
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+
+    plt.legend(fontsize=20, ncol=2, frameon=False)
+    plt.tight_layout()
+    plt.savefig("global_genes.png", dpi=300, bbox_inches="tight")
+    plt.show()
+
+
+
+def plot_clusters(sim, gene="T1"):
+    plt.figure(figsize=(14,8))
+
+    for cid in range(8):
+        values = sim.cluster_gene_history[cid][gene]
+
+        if all(v == 0 for v in values):
+            continue
+
+        plt.plot(
+            values,
+            label=f"C{cid}",
+            linewidth=4.5   # <-- SPESSORE CURVE
+        )
+
+    plt.xlabel("Simulation step", fontsize=20)
+    plt.ylabel(f"{gene} expression", fontsize=20)
+    plt.title(f"{gene} dynamics per cluster", fontsize=24)
+
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+
+    # legenda compatta per 8 cluster
+    plt.legend(
+        fontsize=20,
+        ncol=2,           # <-- 4 colonne = entra tutto
+        frameon=False,
+        loc="upper right"
+    )
+
+    plt.grid(alpha=0.25)
+    plt.tight_layout()
+    plt.savefig(f"{gene}_clusters.png", dpi=300, bbox_inches="tight")
+    plt.show()
+
+
+def save_global_gene_csv(sim, path="global_genes.csv"):
+    genes = list(sim.gene_history.keys())
+    steps = len(sim.gene_history[genes[0]])
+
+    with open(path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["step"] + genes)
+
+        for i in range(steps):
+            row = [i] + [sim.gene_history[g][i] for g in genes]
+            writer.writerow(row)
+
+
+def save_cluster_gene_csv(sim, path="cluster_genes.csv"):
+    genes = ["T1","T2","I","R","M","K","S"]
+    steps = len(sim.cluster_gene_history[0][genes[0]])
+
+    with open(path, "w", newline="") as f:
+        writer = csv.writer(f)
+
+        header = ["step", "cluster", "size"] + genes
+        writer.writerow(header)
+
+        for i in range(steps):
+            for cid in range(8):
+                row = [i, cid, sim.cluster_size_history[cid][i]]
+                for g in genes:
+                    row.append(sim.cluster_gene_history[cid][g][i])
+                writer.writerow(row)
+ 
+
+
+
+def grid_to_numpy(sim):
+    grid = np.full((sim.cfg.height, sim.cfg.width), -1)
+
+    for (q, r), cell in sim.occupancy.items():
+        if cell.cluster_id is None:
+            grid[r, q] = 0
+        else:
+            grid[r, q] = cell.cluster_id + 1
+
+    return grid         
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Evoscope simulation")
+
+    parser.add_argument("--width", type=int, default=46)
+    parser.add_argument("--height", type=int, default=38)
+    parser.add_argument("--seed", type=int, default=11)
+    parser.add_argument("--epochs", type=int, default=120)
+    parser.add_argument("--initial_cells", type=int, default=30)
+    parser.add_argument("--nutrient", type=float, default=6.9)
+    parser.add_argument("--plot", type=str, default='n')
+
+    return parser.parse_args()
+
+def main() -> None:
+
+    args = parse_args()
+
+    cfg = Config(
+        width=args.width,
+        height=args.height,
+        initial_cells=args.initial_cells,
+        initial_medium_nutrient=args.nutrient,
+        seed=args.seed,
+        verbose=False,
+    )
+
+    sim = Evoscope(cfg)
+
+
+
+    frames = sim.run_with_ascii_frames(
+        epochs=120,
+        every=1,
+        include_initial=True,
+        clear_screen=True,
+        pause=0.08,
+    )
+
+    sim.save_ascii_frames("evoscope_ascii_frames.txt", frames)
+
+    print("\nFinal summary:")
+    print(sim.summary_line())
+
+    print("\nFinal snapshot:")
+    print(sim.ascii_snapshot(colored=True))
+
+    print("\nSaved ASCII frames to: evoscope_ascii_frames.txt")
+
+
+    # dopo la simulazione
+
+    save_global_gene_csv(sim)
+    save_cluster_gene_csv(sim)
+
+    if args.plot == 'y':
+        plot_genes(sim)
+        plot_clusters(sim, gene="T1")
+        plot_clusters(sim, gene="T2")
+
+        plot_clusters(sim, gene="I")
+        plot_clusters(sim, gene="R")
+        plot_clusters(sim, gene="M")
+
+        plot_clusters(sim, gene="K")
+        plot_clusters(sim, gene="S")
+
+
+
+if __name__ == "__main__":
+    main()
+
+
