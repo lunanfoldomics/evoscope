@@ -129,9 +129,13 @@ python evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --initial_cells
 Outputs may include:
 
 console summaries
+
 ASCII frame dumps
+
 snapshot arrays
+
 global gene trajectories
+
 cluster-resolved gene trajectories
 
 ### Example output
@@ -139,10 +143,15 @@ cluster-resolved gene trajectories
 Typical simulation dynamics include:
 
 sparse exploratory cells
+
 early nucleation of committed clusters
+
 coexistence of multiple multicellular domains
+
 competitive reshaping of territorial interfaces
+
 fragmentation and collapse under energetic stress
+
 
 The system is intentionally minimal, but it often produces visually rich and interpretable multicellular behaviors.
 
