@@ -32,8 +32,6 @@ Rather than modeling a specific organism, Evoscope provides a **minimal regulato
 
 ---
 
-<img src="images/evoscope_run_001_58.png" alt="run" style="display:block; margin:auto; width:1000px; height:auto;">
-
 ## Concept
 
 Evoscope was developed to investigate a specific question:
