@@ -40,7 +40,7 @@ Evoscope was developed to investigate a specific question:
 
 > Can a minimal multicellular system generate a biologically interpretable **mesoscopic level of organization** linking intracellular regulatory programs to transient colony-level structure?
 
-The simulation represents cells as agents on a **toroidal hexagonal lattice** coupled to a shared nutrient field.
+The simulation represents cells as agents on a **toroidal hexagonal lattice** coupled to a shared nutrient field. Each cell carries a compact internal regulatory program that biases its local behavior and long-term identity.
 
 ## What Evoscope simulates
 
@@ -135,8 +135,6 @@ Typical simulation dynamics include:
 
 The system is intentionally minimal, but it often produces visually rich and interpretable multicellular behaviors.
 
-
-
 ### Multi-run aggregation
 
 The repository may include utilities for aggregating results across multiple seeds.
@@ -153,41 +151,6 @@ This can be used to compute:
 - mean ± standard deviation of cluster-resolved gene trajectories
 - multi-experiment summary figures
 
-## Representation learning
-
-Evoscope also supports a morphology-to-state workflow in which simulation snapshots are used to train convolutional autoencoders with supervised prediction heads.
-
-The goal is to test whether:
-
-- visible morphology contains recoverable information about hidden internal states
-- latent variables can serve as mesoscopic coordinates linking internal regulatory dynamics to emergent multicellular form
-
-This part of the project is intended as a proof of concept for broader applications in:
-
-- digital pathology
-- spatial transcriptomics
-- synthetic morphogenesis
-- interpretable biological representation learning
-
-
-## Scientific context
-
-Evoscope builds on established traditions in:
-
-- agent-based multicellular modeling
-- minimal self-organizing systems
-- dissipative biological organization
-- artificial life
-- latent representation learning
-
-Its contribution is not to reproduce full biochemical realism, but to provide an original minimal integration of:
-
-- regulatory commitment
-- ecological interaction
-- dissipative multicellular dynamics
-- morphology-to-state inference
-
-tailored to the mesoscopic question.
 
 ## Status
 
