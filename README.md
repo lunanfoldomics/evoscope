@@ -1,4 +1,4 @@
-<img src="images/evoscope_logo.png" alt="logo" style="display:block; margin:auto; width:300px; height:auto;">
+<img src="images/evoscope_logo.png" alt="logo" style="display:block; margin:auto; width:500px; height:auto;">
 
 # Evoscope
 A minimal agent-based multicellular simulation for emergent morphology, differentiation, and collective organization in dissipative environments.
