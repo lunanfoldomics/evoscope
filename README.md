@@ -19,7 +19,7 @@ The model combines:
 Rather than modeling a specific organism, Evoscope provides a **minimal regulatory sandbox** for exploring how structured multicellular behaviors can arise from interpretable local rules.
 
 ---
-<img src="images/evoscope_run_001_58.png" alt="run" style="display:block; margin:auto; width:300px; height:auto;">
+<img src="images/evoscope_run_001_58.png" alt="run" style="display:block; margin:auto; width:1000px; height:auto;">
 
 ## Concept
 
