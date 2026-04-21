@@ -42,6 +42,11 @@ Evoscope was developed to investigate a specific question:
 
 The simulation represents cells as agents on a **toroidal hexagonal lattice** coupled to a shared nutrient field. Each cell carries a compact internal regulatory program that biases its local behavior and long-term identity.
 
+## Demo Video
+https://www.youtube.com/watch?v=tgj-fxmyyas
+
+[![Watch the video](https://www.youtube.com/watch?v=tgj-fxmyyas/0.jpg)](https://www.youtube.com/watch?v=tgj-fxmyyas)
+
 ## What Evoscope simulates
 
 Evoscope models a population of cells that:
