@@ -75,8 +75,10 @@ These interactions give rise to dynamic multicellular regimes rather than static
 
 Evoscope is not intended to reproduce a specific organism. Instead, it asks a more fundamental question:
 
-> Can a minimal regulatory grammar generate multicellular states rich enough to be both biologically interesting and computationally learnable?
+> Can a minimal regulatory grammar generate multicellular states rich enough to be both biologically interesting and computationally learnable? 
+
 This makes Evoscope useful both for theoretical biology and for developing machine-learning strategies aimed at connecting morphology, regulation, and latent mesoscopic structure.
+
 ---
 
 ## Installation
