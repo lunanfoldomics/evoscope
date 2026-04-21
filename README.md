@@ -53,7 +53,7 @@ Evoscope models a population of cells that:
 - consume and compete for diffusible nutrients
 - proliferate, die, move, and interact locally
 - commit to heritable identity states
-- form differentiated clusters with distinct collective behaviors
+- form differentiated clusters (numbered from 0 to 7) with distinct collective behaviors
 
 These interactions give rise to dynamic multicellular regimes rather than static structures: colonies form, expand, specialize, compete, drift, and eventually dissolve as ecological constraints accumulate.
 
