@@ -45,7 +45,7 @@ The simulation represents cells as agents on a **toroidal hexagonal lattice** co
 ## Demo Video
 https://www.youtube.com/watch?v=tgj-fxmyyas
 
-[![Watch the video](https://www.youtube.com/watch?v=tgj-fxmyyas/0.jpg)](https://www.youtube.com/watch?v=tgj-fxmyyas)
+[![Watch the video](images/0.jpg)](https://www.youtube.com/watch?v=tgj-fxmyyas)
 
 ## What Evoscope simulates
 
