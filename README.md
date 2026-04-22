@@ -197,6 +197,11 @@ python ../code/correlation_global-or-cluster_latents_and_genes.py \
     --metrics global_genes.csv
 ```
 
+```bash
+python ../code/correlation_global-or-cluster_latents_and_genes.py \
+    --latents cluster_ae_outputs/latents.csv \
+    --metrics cluster_genes.csv
+```
 ## Status
 
 This project is currently under active development.
