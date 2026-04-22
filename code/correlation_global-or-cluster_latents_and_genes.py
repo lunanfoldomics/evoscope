@@ -95,10 +95,9 @@ def main():
     ax.set_xticks(np.arange(len(metric_cols)))
     ax.set_yticks(np.arange(len(latent_cols)))
 
-    ax.set_xticklabels(metric_cols, rotation=45, ha="right")
-    ax.set_yticklabels(latent_cols)
+    ax.set_xticklabels(metric_cols, rotation=45, ha="right", fontsize=16)
+    ax.set_yticklabels(latent_cols, fontsize=16)
 
-    # values in cells
     for i in range(len(latent_cols)):
         for j in range(len(metric_cols)):
             val = corr.values[i, j]
@@ -107,15 +106,16 @@ def main():
                 f"{val:.2f}",
                 ha="center",
                 va="center",
-                fontsize=8,
+                fontsize=15,
                 color="black"
             )
 
-    ax.set_title(args.title)
+    ax.set_title(args.title, fontsize=18)
 
     cbar = plt.colorbar(im, ax=ax)
-    cbar.set_label("Pearson correlation")
-
+    cbar.set_label("Pearson correlation", fontsize=16)
+    cbar.ax.tick_params(labelsize=14)
+    
     plt.tight_layout()
     plt.savefig(args.outfile, dpi=300)
     plt.show()
