@@ -164,21 +164,24 @@ This can be used to compute:
 
 ## Autoencoders
 
-You can run two kind of autoencoders analysis, for identifying latent varables, at global and cluster gene level:
+Evoscope supports two autoencoder workflows for latent-variable discovery:
 
-Global Genes:
+* **global-gene mode**
+* **cluster-gene mode**
 
-```Bash
+### Global-gene mode
+
+```bash
 python ../code/torhex_autoencoder.py \
-       --snapshots_dir snapshots \
-       --global_csv global_genes.csv \
-       --target_mode global \
-       --epochs 100
+    --snapshots_dir snapshots \
+    --global_csv global_genes.csv \
+    --target_mode global \
+    --epochs 100
 ```
 
-Cluster Genes:
+### Cluster-gene mode
 
-```Bash
+```bash
 python ../code/torhex_autoencoder.py \
     --snapshots_dir snapshots \
     --cluster_csv cluster_genes.csv \
@@ -186,10 +189,12 @@ python ../code/torhex_autoencoder.py \
     --epochs 100
 ```
 
-Generate correlation using the correlation_global-or-cluster_latents_and_genes.py script
+### Latent–gene correlation analysis
 
-```Bash
-python ../code/correlation_global-or-cluster_latents_and_genes.py --latents global_ae_outputs/latents.csv --metrics global_genes.csv
+```bash
+python ../code/correlation_global-or-cluster_latents_and_genes.py \
+    --latents global_ae_outputs/latents.csv \
+    --metrics global_genes.csv
 ```
 
 ## Status
