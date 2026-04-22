@@ -14,7 +14,7 @@ HEIGHT="${4:-40}"
 OUTDIR="${5:-runs}"
 
 # Absolute path to evoscope.py
-EVOSCOPE_PY="$(pwd)/evoscope.py"
+EVOSCOPE_PY="$(pwd)/../code/evoscope.py"
 
 if [[ ! -f "$EVOSCOPE_PY" ]]; then
     echo "ERROR: evoscope.py not found in $(pwd)"
