@@ -144,7 +144,13 @@ The system is intentionally minimal, but it often produces visually rich and int
 
 The repository may include utilities for aggregating results across multiple seeds.
 
-For example:
+For example, you can run 10 runs with:
+
+```Bash
+bash ../code/run_evoscope_batch.sh 10 150 60 40 runs
+```
+
+and you can aggregate results with:
 
 ```Bash
 python ../code/aggregate_evoscope.py --root runs --outdir aggregated_outputs
