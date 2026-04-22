@@ -162,6 +162,35 @@ This can be used to compute:
 - mean ± standard deviation of cluster-resolved gene trajectories
 - multi-experiment summary figures
 
+## Autoencoders
+
+You can run two kind of autoencoders analysis, for identifying latent varables, at global and cluster gene level:
+
+Global Genes:
+
+```Bash
+python ../code/torhex_autoencoder.py \
+       --snapshots_dir snapshots \
+       --global_csv global_genes.csv \
+       --target_mode global \
+       --epochs 100
+```
+
+Cluster Genes:
+
+```Bash
+python ../code/torhex_autoencoder.py \
+    --snapshots_dir snapshots \
+    --cluster_csv cluster_genes.csv \
+    --target_mode cluster_flat \
+    --epochs 100
+```
+
+Generate correlation using the correlation_global-or-cluster_latents_and_genes.py script
+
+```Bash
+python ../code/correlation_global-or-cluster_latents_and_genes.py --latents global_ae_outputs/latents.csv --metrics global_genes.csv
+```
 
 ## Status
 
