@@ -191,17 +191,29 @@ python ../code/torhex_autoencoder.py \
 
 ### Latent–gene correlation analysis
 
+Each autoencoder run produces an output folder named `ae_output`. Rename it according to the workflow:
+
+* `global_ae_outputs` for global-gene runs
+* `cluster_ae_outputs` for cluster-gene runs
+
+Then run the correlation script.
+
+**Global-gene correlation**
+
 ```bash
 python ../code/correlation_global-or-cluster_latents_and_genes.py \
     --latents global_ae_outputs/latents.csv \
     --metrics global_genes.csv
 ```
 
+**Cluster-gene correlation**
+
 ```bash
 python ../code/correlation_global-or-cluster_latents_and_genes.py \
     --latents cluster_ae_outputs/latents.csv \
     --metrics cluster_genes.csv
 ```
+
 ## Status
 
 This project is currently under active development.
