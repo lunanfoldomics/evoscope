@@ -108,13 +108,15 @@ If you only want to run the simulator and not the autoencoder analysis, torch is
 ## Running the simulation
 
 ```Bash
-python evoscope.py
+mkdir myrun
+cd myrun
+python ../code/evoscope.py
 ```
 
 If argument parsing is enabled in your current version, a typical command may look like:
 
 ```Bash
-python evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --initial_cells 30 --nutrient 6.9
+python ../code/evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --initial_cells 30 --nutrient 6.9
 ```
 
 Outputs may include:
@@ -145,7 +147,7 @@ The repository may include utilities for aggregating results across multiple see
 For example:
 
 ```Bash
-python aggregate_evoscope_fig4.py --root runs --outdir aggregated_outputs
+python ../code/aggregate_evoscope.py --root runs --outdir aggregated_outputs
 ```
 
 This can be used to compute:
