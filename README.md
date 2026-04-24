@@ -266,6 +266,8 @@ Representative examples of latent–gene correlation heatmaps are shown below fo
 
 ![Cluster latent-gene heatmap](images/example_cluster_heatmap.png)
 
+This workflow produces correlation tables and heatmap visualizations that summarize the relationship between learned latent coordinates and observable regulatory variables. Representative examples from the Evoscope analyses are shown above and are discussed further in the associated preprint.
+
 ---
 ## Status
 
