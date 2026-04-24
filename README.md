@@ -239,6 +239,7 @@ A representative example is shown below for the global regulatory variables, whe
 ![Aggregated global gene trajectories](images/Figure4A_global_genes.png)
 
 *Figure. Representative aggregated trajectories of the global regulatory variables across multiple independent simulations. Solid lines indicate mean expression across runs, and shaded regions indicate ±1 standard deviation. Cluster-resolved trajectories are presented in the associated preprint.*
+
 ---
 
 ## Autoencoders
