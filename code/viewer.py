@@ -102,7 +102,7 @@ def main():
 
     screen_w, screen_h = 1400, 800
     screen = pygame.display.set_mode((screen_w, screen_h))
-    pygame.display.set_caption("Torex Viewer")
+    pygame.display.set_caption("TorHex Viewer")
 
     hex_size = compute_size(w, h, screen_w, screen_h)
     offset_x, offset_y = compute_center_offset(w, h, hex_size, screen_w, screen_h)
