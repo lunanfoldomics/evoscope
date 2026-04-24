@@ -10,12 +10,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-# ======================================================================================
-# Evoscope v1
-# Minimal hex-grid toroidal evo-devo sandbox
+# ============================================================================================
+# Evoscope v0.9.1
+# Author: Luca Zammataro
+# Affiliation: Lunan Foldomics LLC
+# A minimal spatial evo-devo framework for emergent multicellular organization
+# on a toroidal hexagonal grid
 #
-# Use: python evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --nutrient 6.0 --plot n
-# ======================================================================================
+# Example:
+#   python evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --nutrient 6.0 --plot n
+# ============================================================================================
 
 
 class CellCyclePhase(Enum):
