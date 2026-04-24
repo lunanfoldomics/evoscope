@@ -322,15 +322,15 @@ At present, Evoscope should be viewed as:
 
 rather than a calibrated model of any specific tissue or organism.
 
-## Preprint
+## Preprint and citation
 
-A preprint describing the framework is planned / available as:
+If you use this code, please cite:
 
-Luca Zammataro. A Minimal Regulatory Spatial Model for Emergent Multicellular Organization in Dissipative Environments.
+**Luca Zammataro.**  
+*A Minimal Regulatory Spatial Model for Emergent Multicellular Organization in Dissipative Environments.*
 
-## Citation
+(Add the bioRxiv link here after public release.)
 
-If you use this code, please cite the associated preprint once available.
 
 ## License
 
