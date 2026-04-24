@@ -181,6 +181,31 @@ Typical simulation dynamics include:
 The system is intentionally minimal, but it often produces visually rich and interpretable multicellular behaviors.
 ---
 
+## Interactive viewer
+
+Evoscope also includes a `pygame`-based interactive viewer for inspecting simulation snapshots at high resolution.
+
+If launched from a directory containing the snapshot files of a simulation run, the viewer allows you to:
+
+- browse simulation frames interactively;
+- move forward and backward through time;
+- pause and resume playback;
+- monitor the currently displayed frame;
+- inspect multicellular morphologies in a high-resolution visual format;
+- facilitate figure generation for manuscripts and supplementary materials.
+
+To launch the viewer:
+
+```bash
+python ../code/viewer.py
+```
+
+```markdown
+![Evoscope interactive viewer](images/viewer_example.png)
+```
+
+*Example of the Evoscope high-resolution interactive viewer for navigating simulation frames and inspecting multicellular spatial organization.*
+
 ## Multi-run aggregation
 
 Evoscope also supports aggregation across multiple independent simulation seeds.
