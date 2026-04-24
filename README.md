@@ -308,7 +308,7 @@ If you use this code, please cite the associated preprint once available.
 
 ## License
 
-MIT
+This project is released under the MIT License. See the `LICENSE` file for details.
 
 Add the corresponding LICENSE file before making the repository public.
 
