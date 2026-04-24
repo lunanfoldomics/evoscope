@@ -115,14 +115,14 @@ cd evoscope
 pip install -r requirements.txt
 ```
 
-A minimal requirements.txt can include:
+A minimal `requirements.txt` may include:
 
-```Bash
-# Evoscope dependencies
+```bash
 numpy>=1.23
 matplotlib>=3.6
 pandas>=1.5
 torch>=2.0
+pygame>=2.5
 ```
 
 If you only want to run the simulator and not the autoencoder analysis, torch is optional.
