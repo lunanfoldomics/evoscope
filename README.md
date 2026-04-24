@@ -181,12 +181,12 @@ The system is intentionally minimal, but it often produces visually rich and int
 
 ### Multi-run aggregation
 
-The repository may include utilities for aggregating results across multiple seeds.
+Evoscope also supports aggregation across multiple independent simulation seeds.
 
-For example, you can run 10 runs with:
+For example, you can run 100 runs with:
 
 ```Bash
-bash ../code/run_evoscope_batch.sh 10 150 60 40 runs
+bash ../code/run_evoscope_batch.sh 100 150 60 40 runs
 ```
 
 and you can aggregate results with:
@@ -200,6 +200,16 @@ This can be used to compute:
 - mean ± standard deviation of global gene trajectories
 - mean ± standard deviation of cluster-resolved gene trajectories
 - multi-experiment summary figures
+
+### Example aggregation outputs
+
+A representative example is shown below for the **global regulatory variables**, where mean ± standard deviation trajectories are computed across repeated runs. These aggregated trends show that the framework produces reproducible temporal programs rather than purely idiosyncratic single-run behavior.
+
+![Aggregated global gene trajectories](images/Figure4A_global_genes.png)
+
+*Figure. Representative aggregated trajectories of the global regulatory variables across multiple independent simulations. Solid lines indicate mean expression across runs, and shaded regions indicate ±1 standard deviation. Cluster-resolved trajectories are presented in the associated preprint.*
+
+---
 
 ## Autoencoders
 
