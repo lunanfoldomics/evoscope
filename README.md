@@ -40,10 +40,14 @@ Evoscope was developed to investigate a specific question:
 
 The simulation represents cells as agents on a **toroidal hexagonal lattice** coupled to a shared nutrient field. Each cell carries a compact internal regulatory program that biases its local behavior and long-term identity.
 
+---
+
 ## Demo Video
 https://www.youtube.com/watch?v=tgj-fxmyyas
 
 [![Watch the video](images/0.jpg)](https://www.youtube.com/watch?v=tgj-fxmyyas)
+
+---
 
 ## What Evoscope simulates
 
@@ -76,11 +80,13 @@ These interactions give rise to dynamic multicellular regimes rather than static
 
 ## Why this project matters
 
-Evoscope is not intended to reproduce a specific organism. Instead, it asks a more fundamental question:
+Evoscope was designed to build a synthetic multicellular world that is simple enough to remain interpretable, yet rich enough to generate structured morphodynamic regimes that can be learned by convolutional encoders.
 
-> Can a minimal regulatory grammar generate multicellular states rich enough to be both biologically interesting and computationally learnable? 
+It is not intended to reproduce any specific organism. Instead, it asks a more fundamental question:
 
-This makes Evoscope useful both for theoretical biology and for developing machine-learning strategies aimed at connecting morphology, regulation, and latent mesoscopic structure.
+> Can a minimal regulatory grammar generate multicellular states rich enough to be both biologically meaningful and computationally learnable?
+
+This makes Evoscope relevant both to theoretical biology and to the development of machine-learning strategies aimed at connecting morphology, regulation, and latent mesoscopic structure.
 
 ---
 
@@ -131,11 +137,11 @@ Outputs may include:
 
 Typical simulation dynamics include:
 
--sparse exploratory cells
--early nucleation of committed clusters
--coexistence of multiple multicellular domains
--competitive reshaping of territorial interfaces
--fragmentation and collapse under energetic stress
+- sparse exploratory cells
+- early nucleation of committed clusters
+- coexistence of multiple multicellular domains
+- competitive reshaping of territorial interfaces
+- fragmentation and collapse under energetic stress
 
 
 The system is intentionally minimal, but it often produces visually rich and interpretable multicellular behaviors.
