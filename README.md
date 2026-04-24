@@ -253,6 +253,20 @@ python ../code/correlation_global-or-cluster_latents_and_genes.py \
     --metrics cluster_genes.csv
 ```
 
+This analysis typically produces:
+- correlation tables linking latent coordinates to gene-level observables;
+- heatmap visualizations summarizing latent–observable relationships;
+- output files that can be compared across independent simulation seeds.
+
+## Example correlation outputs
+
+Representative examples of latent–gene correlation heatmaps are shown below for the global-gene and cluster-gene workflows.
+
+![Global latent-gene heatmap](images/example_global_heatmap.png)
+
+![Cluster latent-gene heatmap](images/example_cluster_heatmap.png)
+
+---
 ## Status
 
 This project is currently under active development.
