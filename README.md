@@ -200,9 +200,8 @@ To launch the viewer:
 python ../code/viewer.py
 ```
 
-```markdown
 ![Evoscope interactive viewer](images/viewer_example.png)
-```
+
 
 *Example of the Evoscope high-resolution interactive viewer for navigating simulation frames and inspecting multicellular spatial organization.*
 
