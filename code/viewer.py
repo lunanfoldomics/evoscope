@@ -5,6 +5,17 @@ import glob
 import time
 import re
 
+# ======================================================================================
+# TorHex Viewer v0.9.1
+# Interactive high-resolution viewer for exploring Evoscope spatial dynamics
+# Luca Zammataro - Lunan Foldomics LLC
+#
+# Use:
+#   python viewer.py
+#
+# Launch from a directory containing the snapshots of a simulation run.
+# ======================================================================================
+
 SIZE = 10
 
 COLORS = {
