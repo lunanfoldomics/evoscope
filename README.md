@@ -268,7 +268,7 @@ This analysis typically produces:
 - heatmap visualizations summarizing latent–observable relationships;
 - output files that can be compared across independent simulation seeds.
 
-## Example correlation outputs
+### Example correlation outputs
 
 Representative examples of latent–gene correlation heatmaps are shown below for the global-gene and cluster-gene workflows.
 
