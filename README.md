@@ -135,10 +135,11 @@ pip install -r requirements.txt
 A minimal requirements.txt can include:
 
 ```Bash
-numpy
-matplotlib
-pandas
-torch
+# Evoscope dependencies
+numpy>=1.23
+matplotlib>=3.6
+pandas>=1.5
+torch>=2.0
 ```
 
 If you only want to run the simulator and not the autoencoder analysis, torch is optional.
