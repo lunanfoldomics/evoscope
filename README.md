@@ -179,6 +179,7 @@ Typical simulation dynamics include:
 
 
 The system is intentionally minimal, but it often produces visually rich and interpretable multicellular behaviors.
+
 ---
 
 ## Interactive viewer
@@ -206,6 +207,7 @@ python ../code/viewer.py
 *Example of the Evoscope high-resolution interactive viewer for navigating simulation frames and inspecting multicellular spatial organization.*
 
 ASCII snapshots remain particularly useful for interpreting cluster identities and domain boundaries, whereas the high-resolution viewer is more useful for visual exploration and figure generation.
+
 ---
 
 ## Multi-run aggregation
