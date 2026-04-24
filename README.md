@@ -105,23 +105,6 @@ Adapt these paths as needed for your local setup.
 
 ---
 
-## Conda environment
-
-You can also create a Conda environment for Evoscope:
-
-```bash
-conda env create -f environment.yml
-conda activate evoscope
-```
-
-If you prefer, you can install the dependencies with pip instead:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
 ## Installation
 
 Clone the repository and install the required Python packages:
@@ -144,6 +127,24 @@ torch>=2.0
 
 If you only want to run the simulator and not the autoencoder analysis, torch is optional.
 
+---
+
+## Conda environment
+
+You can also create a Conda environment for Evoscope:
+
+```bash
+conda env create -f environment.yml
+conda activate evoscope
+```
+
+If you prefer, you can install the dependencies with pip instead:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
 ## Running the simulation
 
 ```Bash
