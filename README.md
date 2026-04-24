@@ -299,19 +299,13 @@ A preprint describing the framework is planned / available as:
 
 Luca Zammataro. A Minimal Regulatory Spatial Model for Emergent Multicellular Organization in Dissipative Environments.
 
-(A bioRxiv entry will be added here after public release soon).
-
 ## Citation
 
 If you use this code, please cite the associated preprint once available.
 
-(A BibTeX entry will be added here after public release soon).
-
 ## License
 
 This project is released under the MIT License. See the `LICENSE` file for details.
-
-Add the corresponding LICENSE file before making the repository public.
 
 ## Contact
 
