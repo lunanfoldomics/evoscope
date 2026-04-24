@@ -205,6 +205,9 @@ python ../code/viewer.py
 
 *Example of the Evoscope high-resolution interactive viewer for navigating simulation frames and inspecting multicellular spatial organization.*
 
+ASCII snapshots remain particularly useful for interpreting cluster identities and domain boundaries, whereas the high-resolution viewer is more useful for visual exploration and figure generation.
+---
+
 ## Multi-run aggregation
 
 Evoscope also supports aggregation across multiple independent simulation seeds.
@@ -234,7 +237,6 @@ A representative example is shown below for the global regulatory variables, whe
 ![Aggregated global gene trajectories](images/Figure4A_global_genes.png)
 
 *Figure. Representative aggregated trajectories of the global regulatory variables across multiple independent simulations. Solid lines indicate mean expression across runs, and shaded regions indicate ±1 standard deviation. Cluster-resolved trajectories are presented in the associated preprint.*
-
 ---
 
 ## Autoencoders
