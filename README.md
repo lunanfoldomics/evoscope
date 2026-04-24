@@ -178,32 +178,33 @@ Typical simulation dynamics include:
 
 
 The system is intentionally minimal, but it often produces visually rich and interpretable multicellular behaviors.
+---
 
-### Multi-run aggregation
+## Multi-run aggregation
 
 Evoscope also supports aggregation across multiple independent simulation seeds.
 
-For example, you can run 100 runs with:
+For example, you can run 100 simulations with:
 
-```Bash
+```bash
 bash ../code/run_evoscope_batch.sh 100 150 60 40 runs
 ```
 
-and you can aggregate results with:
+and aggregate the results with:
 
-```Bash
+```bash
 python ../code/aggregate_evoscope.py --root runs --outdir aggregated_outputs
 ```
 
 This can be used to compute:
 
-- mean ± standard deviation of global gene trajectories
-- mean ± standard deviation of cluster-resolved gene trajectories
-- multi-experiment summary figures
+mean ± standard deviation of global gene trajectories;
+mean ± standard deviation of cluster-resolved gene trajectories;
+multi-experiment summary figures.
 
 ### Example aggregation outputs
 
-A representative example is shown below for the **global regulatory variables**, where mean ± standard deviation trajectories are computed across repeated runs. These aggregated trends show that the framework produces reproducible temporal programs rather than purely idiosyncratic single-run behavior.
+A representative example is shown below for the global regulatory variables, where mean ± standard deviation trajectories are computed across repeated runs. These aggregated trends show that the framework produces reproducible temporal programs rather than purely idiosyncratic single-run behavior.
 
 ![Aggregated global gene trajectories](images/Figure4A_global_genes.png)
 
