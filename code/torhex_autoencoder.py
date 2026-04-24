@@ -12,7 +12,7 @@ from torch.utils.data import Dataset, DataLoader, random_split
 
 
 # ============================================================
-# Torex / Evoscope autoencoder
+# TorHex / Evoscope autoencoder v0.9.1
 # ------------------------------------------------------------
 # Learns a latent representation of morphology snapshots and,
 # optionally, predicts associated gene expression profiles.
