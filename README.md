@@ -327,9 +327,7 @@ rather than a calibrated model of any specific tissue or organism.
 If you use this code, please cite:
 
 *A Minimal Regulatory Spatial Model for Emergent Multicellular Organization in Dissipative Environments*
-
 Luca Zammataro
-
 bioRxiv 2026.04.24.720740; doi: https://doi.org/10.64898/2026.04.24.720740
 
 ## License
