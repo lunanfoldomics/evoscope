@@ -332,6 +332,7 @@ Luca Zammataro
 
 bioRxiv 2026.04.24.720740; doi: https://doi.org/10.64898/2026.04.24.720740
 
+```Text
 @article {Zammataro2026.04.24.720740,
 	author = {Zammataro, Luca},
 	title = {A Minimal Regulatory Spatial Model for Emergent Multicellular Organization in Dissipative Environments},
@@ -344,6 +345,7 @@ bioRxiv 2026.04.24.720740; doi: https://doi.org/10.64898/2026.04.24.720740
 	eprint = {https://www.biorxiv.org/content/early/2026/05/04/2026.04.24.720740.full.pdf},
 	journal = {bioRxiv}
 }
+```
 
 ## License
 
