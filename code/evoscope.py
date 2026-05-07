@@ -146,7 +146,7 @@ class Cell:
     candidate_cluster: Optional[int] = None
     candidate_cluster_epochs: int = 0
 
-    # 10 proteins / genes
+    # Genomoid/proteins: 10 proteins / genes
     proteins: Dict[str, Union[float, List[float]]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
