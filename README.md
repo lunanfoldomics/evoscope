@@ -322,6 +322,14 @@ At present, Evoscope should be viewed as:
 
 rather than a calibrated model of any specific tissue or organism.
 
+---
+
+## Evoscope package
+
+Evoscope preserves its original command-line workflow while exposing the core simulation and analysis tools as a modular Python package. This allows the same codebase to be used both for reproducible terminal-based analyses and for interactive notebook-based exploration.
+
+---
+
 ## Preprint and citation
 
 If you use this code, please cite:
