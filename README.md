@@ -153,7 +153,9 @@ cd myrun
 python ../code/evoscope.py
 ```
 
-If argument parsing is enabled in your current version, a typical command may look like:
+The command below uses the representative Evoscope simulation settings used in the paper cited above.  
+These values are provided as a reference configuration for reproducing the example workflow.
+
 
 ```Bash
 python ../code/evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --initial_cells 30 --nutrient 6.9
