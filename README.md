@@ -206,7 +206,7 @@ python ../code/viewer.py
 ![Evoscope interactive viewer](images/viewer_example.png)
 
 
-*Example of the Evoscope high-resolution interactive viewer for navigating simulation frames and inspecting multicellular spatial organization.*
+*Example of the Evoscope high-resolution interactive viewer for navigating simulation frames and inspecting multicellular spatial organization (epoch 45).*
 
 ASCII snapshots remain particularly useful for interpreting cluster identities and domain boundaries, whereas the high-resolution viewer is more useful for visual exploration and figure generation.
 
