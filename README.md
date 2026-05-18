@@ -330,6 +330,26 @@ rather than a calibrated model of any specific tissue or organism.
 
 Evoscope preserves its original command-line workflow while exposing the core simulation and analysis tools as a modular Python package. This allows the same codebase to be used both for reproducible terminal-based analyses and for interactive notebook-based exploration.
 
+The modular package is located in:
+
+```text
+code/evoscope/
+```
+
+It includes the simulation engine, visualization tools, CSV exporters, autoencoder utilities, latent-space analysis, correlation analysis, and plotting functions used by the teaching notebook.
+
+---
+
+## Teaching notebook
+
+A self-contained teaching notebook is available in:
+
+```text
+notebooks/01_evoscope_teaching_intro.ipynb
+```
+
+The notebook provides an interactive walkthrough of the Evoscope simulation, gene-dynamics export, autoencoder training, latent-variable extraction, correlation analysis, and attractor visualization.
+
 ---
 
 ## Preprint and citation
