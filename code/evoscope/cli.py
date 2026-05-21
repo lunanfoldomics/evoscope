@@ -1,3 +1,20 @@
+"""
+Command-line interface for running Evoscope simulations.
+
+This module provides a lightweight CLI entry point for configuring and
+executing an Evoscope simulation from the terminal. It parses user-specified
+grid size, seed, number of epochs, initial cell count, nutrient level, and
+plotting options.
+
+After the simulation completes, the CLI exports ASCII frames, prints a final
+summary, saves global and cluster-level gene/protein CSV files, and can
+optionally generate diagnostic plots.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 import argparse
 
 from .config import Config
