@@ -1,3 +1,21 @@
+"""
+Configuration parameters for the Evoscope simulation.
+
+This module defines the `Config` dataclass, which centralizes all tunable
+parameters controlling the spatial world, nutrient field, energy dynamics,
+cell-cycle progression, gene/protein regulation, commitment behavior,
+movement, division, attack behavior, and snapshot generation.
+
+The purpose of this module is to keep the biological and physical assumptions
+of the model explicit, editable, and reproducible. A `Config` instance is
+passed to the main Evoscope simulation engine and determines the initial
+conditions and dynamical rules of each run.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 from dataclasses import dataclass
 
 
