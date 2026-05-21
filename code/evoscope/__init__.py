@@ -1,3 +1,20 @@
+"""
+Evoscope package public API.
+
+This module exposes the main simulation objects and utility functions used by
+the Evoscope framework. It provides convenient top-level imports for creating
+simulation configurations, running the Evoscope model, handling cell states,
+and exporting grid states as numerical arrays.
+
+The package is organized around a modular architecture:
+configuration, state definitions, grid topology, simulation dynamics,
+input/output utilities, visualization, latent-space analysis, and
+autoencoder-based morphology learning.
+
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 from .config import Config
 from .simulation import Evoscope
 from .state import Cell, PlannedAction
