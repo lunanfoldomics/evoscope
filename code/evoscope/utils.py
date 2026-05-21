@@ -1,3 +1,20 @@
+"""
+General utility functions for Evoscope.
+
+This module contains small helper functions used across the simulation,
+including numerical clamping, extraction of total protein values from scalar
+or directional representations, directional protein lookup, and conversion of
+a live simulation state into a 2D NumPy grid.
+
+The exported grid representation encodes empty sites, undetermined cells, and
+committed cluster identities, and is used for snapshot export, visualization,
+and downstream machine-learning analyses.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 from typing import List, Union
 import numpy as np
 
