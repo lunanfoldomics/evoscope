@@ -1,3 +1,21 @@
+"""
+Cell-level state objects for the Evoscope simulation.
+
+This module defines the core dataclasses used to represent individual cells
+and their planned actions. The `Cell` object stores energy, age, division
+history, cell-cycle state, commitment state, cluster identity, stress
+bookkeeping variables, and the internal gene/protein-like regulatory state.
+
+The module also implements daughter-cell generation during division,
+including inheritance of regulatory variables, energy partitioning, and
+small stochastic perturbations of directional proteins. This provides the
+local state substrate on which the higher-level Evoscope simulation operates.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
