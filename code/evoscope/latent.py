@@ -1,4 +1,19 @@
-"""Latent-space export and prediction utilities for Evoscope autoencoders."""
+"""
+Latent-space export and prediction utilities for Evoscope autoencoders.
+
+This module contains helper functions for applying a trained autoencoder to
+an Evoscope dataset. It extracts latent variables for each simulation step and
+exports true versus predicted gene/protein targets.
+
+These outputs support downstream interpretation of learned morphology
+coordinates, including trajectory analysis, attractor-like phase portraits,
+and correlation with observable regulatory dynamics.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 
 from __future__ import annotations
 
