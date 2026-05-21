@@ -1,4 +1,19 @@
-"""Plotting utilities for Evoscope latent trajectories and attractor-like phase portraits."""
+"""
+Analysis plots for Evoscope latent trajectories and phase portraits.
+
+This module provides plotting utilities for visualizing the temporal evolution
+of learned latent variables and their low-dimensional phase-space behavior.
+It supports both global and cluster-level latent representations and can
+generate compact summary figures combining latent trajectories with
+attractor-like phase portraits.
+
+These plots are designed to help interpret whether simulated morphologies
+move through stable, cyclic, transient, or divergent regions of latent space.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
 
 from __future__ import annotations
 
