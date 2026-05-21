@@ -1,3 +1,21 @@
+"""
+Toroidal hexagonal grid topology for Evoscope.
+
+This module defines the axial-coordinate hexagonal lattice used by the
+simulation. The grid is toroidal, meaning that positions wrap around at the
+boundaries. This removes edge effects and allows local cell-cell interactions
+to be studied in a closed spatial environment.
+
+The module provides neighbor lookup, coordinate wrapping, and iteration over
+all grid positions. These operations are used by the simulation engine to
+evaluate local crowding, nutrient context, movement, division, and interaction
+rules.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 from typing import List, Tuple
 
 
