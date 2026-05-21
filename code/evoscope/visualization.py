@@ -1,3 +1,20 @@
+"""
+Visualization utilities for Evoscope simulation outputs.
+
+This module provides plotting functions for inspecting the regulatory and
+spatial behavior of an Evoscope run. It includes plots for global gene
+dynamics, cluster-specific gene dynamics, and static visualization of grid
+arrays.
+
+These functions are intended for exploratory analysis, quality control,
+figure generation, and rapid inspection of how local regulatory rules produce
+emergent spatial organization over time.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 import matplotlib.pyplot as plt
 
 
