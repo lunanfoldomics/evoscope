@@ -1,4 +1,21 @@
-"""Convolutional autoencoder utilities for Evoscope morphology snapshots."""
+"""
+Convolutional autoencoder models for Evoscope morphology snapshots.
+
+This module implements the neural-network components used to learn latent
+representations of Evoscope spatial configurations. The main model encodes
+one-hot grid snapshots into a low-dimensional latent space, reconstructs the
+input morphology, and optionally predicts associated global or cluster-level
+gene/protein targets.
+
+The module also provides training utilities, validation logic, early stopping,
+device resolution, history export, latent export, and prediction export. It
+can be used both as a command-line script and as an importable training module
+inside notebooks or larger workflows.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
 
 from __future__ import annotations
 
