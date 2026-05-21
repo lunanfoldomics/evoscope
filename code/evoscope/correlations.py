@@ -1,4 +1,19 @@
-"""Correlation analysis between latent variables and observable Evoscope metrics."""
+"""
+Correlation analysis between Evoscope latent variables and observable metrics.
+
+This module computes and visualizes associations between learned latent-space
+coordinates and measurable simulation outputs, such as global or cluster-level
+gene/protein dynamics. It supports merging latent and metric tables by
+simulation step, computing correlation matrices, and generating annotated
+heatmaps.
+
+The goal is to help interpret what each latent dimension captures about the
+emergent morphology-regulation relationship in Evoscope simulations.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
 
 from __future__ import annotations
 
