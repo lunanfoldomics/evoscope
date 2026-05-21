@@ -1,9 +1,21 @@
-"""Dataset and target-loading utilities for Evoscope morphology autoencoders.
-
-This module converts Evoscope grid snapshots saved as ``grid_XXX.npy`` files
-into one-hot tensors suitable for convolutional neural networks, and aligns
-those snapshots with either global gene dynamics or cluster-level gene dynamics.
 """
+Dataset and target-loading utilities for Evoscope morphology learning.
+
+This module converts Evoscope morphology snapshots, saved as `grid_XXX.npy`
+files, into one-hot encoded tensors suitable for convolutional neural
+networks. It also aligns each morphology snapshot with either global
+gene/protein summaries or flattened cluster-level gene/protein summaries.
+
+The resulting `TorexDataset` provides a bridge between the simulated spatial
+morphology and downstream machine-learning models, enabling latent-space
+learning of tissue-like organization and its relationship to regulatory
+dynamics.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 
 from __future__ import annotations
 
