@@ -1,3 +1,26 @@
+"""
+Core Evoscope simulation engine.
+
+This module implements the main `Evoscope` class, which evolves a population
+of simulated cells on a toroidal hexagonal grid. The simulation couples local
+nutrient availability, cell energy, cell-cycle progression, commitment and
+decommitment, directional protein-like variables, movement, division,
+competition, and cluster-level organization.
+
+At each simulation step, cells sense their local environment, update their
+internal regulatory state, select possible actions, and modify the spatial
+configuration of the tissue-like system. The engine also records global and
+cluster-level gene/protein summaries and exports morphology snapshots for
+visualization and downstream analysis.
+
+Conceptually, this module is the dynamical core of Evoscope: it links local
+regulatory rules to emergent spatial organization.
+
+Evoscope v0.9.1
+Author: Luca Zammataro
+Organization: Lunan Foldomics LLC
+"""
+
 from __future__ import annotations
 
 import os
