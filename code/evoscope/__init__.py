@@ -11,6 +11,7 @@ configuration, state definitions, grid topology, simulation dynamics,
 input/output utilities, visualization, latent-space analysis, and
 autoencoder-based morphology learning.
 
+Evoscope v0.9.1
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
