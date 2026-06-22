@@ -10,7 +10,7 @@ The exported grid representation encodes empty sites, undetermined cells, and
 committed cluster identities, and is used for snapshot export, visualization,
 and downstream machine-learning analyses.
 
-Evoscope v0.9.1
+Evoscope v0.9.2
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
