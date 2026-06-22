@@ -111,21 +111,15 @@ Clone the repository and install the required Python packages:
 
 ```bash
 git clone https://github.com/lunanfoldomics/evoscope.git
-cd evoscope
-pip install -r requirements.txt
 ```
 
-A minimal `requirements.txt` may include:
+The revised Evoscope codebase is distributed as an installable Python package.
+From the `code/` directory, install in editable mode:
 
 ```bash
-numpy>=1.23
-matplotlib>=3.6
-pandas>=1.5
-torch>=2.0
-pygame>=2.5
+cd evoscope/code
+python -m pip install -e .
 ```
-
-If you only want to run the simulator and not the autoencoder analysis, torch is optional.
 
 ---
 
@@ -138,36 +132,35 @@ conda env create -f environment.yml
 conda activate evoscope
 ```
 
-If you prefer, you can install the dependencies with pip instead:
-
-```bash
-pip install -r requirements.txt
-```
-
 ---
+
 ## Running the simulation
 
-```Bash
+```bash
 mkdir myrun
 cd myrun
-python ../code/evoscope.py
 ```
 
-The command below uses the representative Evoscope simulation settings used in the paper cited above.  
-These values are provided as a reference configuration for reproducing the example workflow.
+The representative simulation used in the manuscript can be reproduced with:
 
+```bash
+evoscope --width 60 --height 40 --seed 42 --epochs 150 --initial_cells 30 --nutrient 6.9
+```
+or
 
-```Bash
-python ../code/evoscope.py --width 60 --height 40 --seed 42 --epochs 150 --initial_cells 30 --nutrient 6.9
+```bash
+python -m evoscope.cli --width 60 --height 40 --seed 42 --epochs 150 --initial_cells 30 --nutrient 6.9
 ```
 
-Outputs may include:
+### Outputs include:
 
 - console summaries
 - ASCII frame dumps
 - snapshot arrays
-- global gene trajectories
-- cluster-resolved gene trajectories
+- global_genes.csv (global gene trajectories)
+- cluster_genes.csv (cluster-resolved gene trajectories)
+- population_metrics.csv
+
 
 ### Example output
 
