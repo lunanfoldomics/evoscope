@@ -113,6 +113,15 @@ Clone the repository and install the required Python packages:
 git clone https://github.com/lunanfoldomics/evoscope.git
 ```
 
+## Conda environment
+
+You can also create a Conda environment for Evoscope:
+
+```bash
+conda env create -f environment.yml
+conda activate evoscope
+```
+
 The revised Evoscope codebase is distributed as an installable Python package.
 From the `code/` directory, install in editable mode:
 
@@ -123,14 +132,7 @@ python -m pip install -e .
 
 ---
 
-## Conda environment
 
-You can also create a Conda environment for Evoscope:
-
-```bash
-conda env create -f environment.yml
-conda activate evoscope
-```
 
 ---
 
