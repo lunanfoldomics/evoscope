@@ -16,7 +16,7 @@ visualization and downstream analysis.
 Conceptually, this module is the dynamical core of Evoscope: it links local
 regulatory rules to emergent spatial organization.
 
-Evoscope v0.9.1
+Evoscope v0.9.2
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
@@ -726,11 +726,32 @@ class Evoscope:
         mean_energy = total_energy / alive if alive else 0.0
         medium_nutrient = sum(self.nutrient.values())
 
+        '''
         committed = sum(1 for c in self.occupancy.values() if c.commitment == CommitmentState.COMMITTED)
         clusters: Dict[int, int] = {}
         for c in self.occupancy.values():
             if c.cluster_id is not None:
                 clusters[c.cluster_id] = clusters.get(c.cluster_id, 0) + 1
+        '''
+
+        committed = sum(
+            1 for c in self.occupancy.values()
+            if c.commitment == CommitmentState.COMMITTED
+        )
+        undetermined = sum(
+            1 for c in self.occupancy.values()
+            if c.commitment == CommitmentState.UNDETERMINED
+        )
+        decommitted = sum(
+            1 for c in self.occupancy.values()
+            if c.commitment == CommitmentState.DECOMMITTED
+        )
+
+        clusters: Dict[int, int] = {}
+        for c in self.occupancy.values():
+            if c.cluster_id is not None:
+                clusters[c.cluster_id] = clusters.get(c.cluster_id, 0) + 1
+                
 
         return {
             "epoch": float(self.epoch),
@@ -738,6 +759,9 @@ class Evoscope:
             "mean_energy": mean_energy,
             "medium_nutrient": medium_nutrient,
             "committed": float(committed),
+            "undetermined": float(undetermined),
+            "decommitted": float(decommitted),
+            "uncommitted": float(undetermined + decommitted),
             "n_clusters_present": float(len(clusters)),
             "largest_cluster": float(max(clusters.values()) if clusters else 0),
         }
