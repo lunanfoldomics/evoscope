@@ -9,7 +9,7 @@ These outputs support downstream interpretation of learned morphology
 coordinates, including trajectory analysis, attractor-like phase portraits,
 and correlation with observable regulatory dynamics.
 
-Evoscope v0.9.1
+Evoscope v0.9.2
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
