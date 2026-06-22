@@ -11,7 +11,7 @@ all grid positions. These operations are used by the simulation engine to
 evaluate local crowding, nutrient context, movement, division, and interaction
 rules.
 
-Evoscope v0.9.1
+Evoscope v0.9.2
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
