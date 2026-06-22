@@ -15,11 +15,12 @@ cluster_genes.csv
     Cluster-specific expression values and cluster sizes over simulation
     steps.
 
-Evoscope v0.9.1
+Evoscope v0.9.2
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
 
+from .enums import CommitmentState
 import csv
 
 
@@ -53,3 +54,99 @@ def save_cluster_gene_csv(sim, path="cluster_genes.csv"):
                 for g in genes:
                     row.append(sim.cluster_gene_history[cid][g][i])
                 writer.writerow(row)
+
+
+
+def save_population_metrics_csv(sim, path="population_metrics.csv"):
+    """Export population-level covariates for representation-learning controls.
+
+    This file is intended to support interpretation of latent trajectories by
+    recording simple demographic and occupancy variables over time. It does not
+    alter the simulation dynamics and is not used as an autoencoder target.
+    """
+
+    # The core histories are already accumulated during simulation.
+    # We use their length to determine how many sampled steps were exported.
+    genes = list(sim.gene_history.keys())
+    if not genes:
+        return
+
+    steps = len(sim.gene_history[genes[0]])
+    lattice_sites = sim.cfg.width * sim.cfg.height
+
+    header = [
+        "step",
+        "total_cells",
+        "empty_sites",
+        "occupied_density",
+        "committed_cells",
+        "committed_density",
+        "undetermined_cells",
+        "undetermined_density",
+        "decommitted_cells",
+        "decommitted_density",
+        "uncommitted_cells",
+        "uncommitted_density",
+        "n_clusters_present",
+        "largest_cluster",
+    ] + [f"cluster_{cid}_size" for cid in range(8)]
+
+    with open(path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+
+        for i in range(steps):
+            cluster_sizes = [
+                sim.cluster_size_history[cid][i]
+                for cid in range(8)
+            ]
+
+            committed_cells = sum(cluster_sizes)
+
+            # When available, use metrics_history for total population size.
+            # This records all occupied cells, including undetermined and
+            # decommitted cells.
+            if i < len(sim.metrics_history):
+                total_cells = int(sim.metrics_history[i].get("alive", committed_cells))
+                n_clusters_present = int(sim.metrics_history[i].get("n_clusters_present", 0))
+                largest_cluster = int(sim.metrics_history[i].get("largest_cluster", max(cluster_sizes) if cluster_sizes else 0))
+            else:
+                total_cells = committed_cells
+                n_clusters_present = sum(1 for s in cluster_sizes if s > 0)
+                largest_cluster = max(cluster_sizes) if cluster_sizes else 0
+
+            empty_sites = lattice_sites - total_cells
+            uncommitted_cells = total_cells - committed_cells
+
+            # The current histories do not separately store undetermined and
+            # decommitted counts over past time steps. We therefore export the
+            # combined uncommitted count and leave the separated fields empty.
+
+            undetermined_cells = int(sim.metrics_history[i].get("undetermined", 0))
+            decommitted_cells = int(sim.metrics_history[i].get("decommitted", 0))
+
+            occupied_density = total_cells / lattice_sites if lattice_sites else 0.0
+            committed_density = committed_cells / lattice_sites if lattice_sites else 0.0
+            uncommitted_density = uncommitted_cells / lattice_sites if lattice_sites else 0.0
+
+            undetermined_density = undetermined_cells / lattice_sites if lattice_sites else 0.0
+            decommitted_density = decommitted_cells / lattice_sites if lattice_sites else 0.0
+
+            row = [
+                i,
+                total_cells,
+                empty_sites,
+                occupied_density,
+                committed_cells,
+                committed_density,
+                undetermined_cells,
+                undetermined_density,
+                decommitted_cells,
+                decommitted_density,
+                uncommitted_cells,
+                uncommitted_density,
+                n_clusters_present,
+                largest_cluster,
+            ] + cluster_sizes
+
+            writer.writerow(row)
