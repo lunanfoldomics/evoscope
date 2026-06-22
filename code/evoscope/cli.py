@@ -10,7 +10,7 @@ After the simulation completes, the CLI exports ASCII frames, prints a final
 summary, saves global and cluster-level gene/protein CSV files, and can
 optionally generate diagnostic plots.
 
-Evoscope v0.9.1
+Evoscope v0.9.2
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
@@ -19,7 +19,12 @@ import argparse
 
 from .config import Config
 from .simulation import Evoscope
-from .io import save_cluster_gene_csv, save_global_gene_csv
+from .io import (
+    save_cluster_gene_csv,
+    save_global_gene_csv,
+    save_population_metrics_csv,
+)
+
 from .visualization import plot_clusters, plot_genes
 
 
@@ -64,6 +69,8 @@ def main() -> None:
 
     save_global_gene_csv(sim)
     save_cluster_gene_csv(sim)
+    save_population_metrics_csv(sim)
+
 
     if args.plot.lower() == "y":
         plot_genes(sim, save_path="global_genes.png")
