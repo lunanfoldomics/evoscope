@@ -198,12 +198,12 @@ class Evoscope:
 
             self.cluster_size_history[cid].append(cluster_counts[cid])
 
-        if self.epoch % 5 == 0:
+
+        if self.epoch % self.cfg.snapshot_every == 0:
             np.save(
                 os.path.join(self.cfg.snapshot_dir, f"grid_{self.epoch:03d}.npy"),
                 grid_to_numpy(self),
-            )            
-
+            )
 
     def _sense(self, pos: Tuple[int, int], cell: Cell) -> Dict:
         neighbors = self.grid.neighbors(pos)
