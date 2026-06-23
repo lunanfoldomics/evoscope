@@ -132,25 +132,23 @@ python -m pip install -e .
 
 ---
 
-## Running the simulation
+## Running a simulation
 
-```bash
-mkdir myrun
-cd myrun
-```
-
+After installing the package, a simulation can be launched directly from the command line.
 The representative simulation used in the manuscript can be reproduced with:
 
+
 ```bash
-evoscope --width 60 --height 40 --seed 42 --epochs 150 --initial_cells 30 --nutrient 6.9
+evoscope --width 60 --height 40 --seed 38 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_38
 ```
+
 or
 
 ```bash
-python -m evoscope.cli --width 60 --height 40 --seed 42 --epochs 150 --initial_cells 30 --nutrient 6.9
+python -m evoscope.cli --width 60 --height 40 --seed 38 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_38
 ```
 
-### Outputs include:
+Each run exports:
 
 - console summaries
 - ASCII frame dumps
@@ -159,6 +157,12 @@ python -m evoscope.cli --width 60 --height 40 --seed 42 --epochs 150 --initial_c
 - cluster_genes.csv (cluster-resolved gene trajectories)
 - population_metrics.csv
 
+Example for multiple random seeds:
+```bash
+evoscope --width 60 --height 40 --seed 38 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_38
+evoscope --width 60 --height 40 --seed 40 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_40
+evoscope --width 60 --height 40 --seed 53 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_53
+```
 
 ### Example output
 
@@ -205,15 +209,7 @@ ASCII snapshots remain particularly useful for interpreting cluster identities a
 
 ## Multi-run aggregation
 
-Evoscope also supports aggregation across multiple independent simulation seeds.
-
-For example, you can run 100 simulations with:
-
-```bash
-bash ../code/run_evoscope_batch.sh 100 150 60 40 runs
-```
-
-and aggregate the results with:
+Aggregated plots and summary tables across multiple runs can then be generated with:
 
 ```bash
 python ../code/aggregate_evoscope.py --root runs --outdir aggregated_outputs
