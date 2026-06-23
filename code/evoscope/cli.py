@@ -55,6 +55,7 @@ def main() -> None:
         initial_cells=args.initial_cells,
         initial_medium_nutrient=args.nutrient,
         seed=args.seed,
+        snapshot_dir=str(outdir / "snapshots"),
         verbose=False,
     )
 
