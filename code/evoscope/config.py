@@ -91,6 +91,8 @@ class Config:
     daughter_polarity_noise: float = 0.04
 
     snapshot_every: int = 1
+    # snapshots location
+    snapshot_dir: str = "snapshots"
 
     verbose: bool = False
 
