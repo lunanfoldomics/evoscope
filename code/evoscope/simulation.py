@@ -40,7 +40,7 @@ class Evoscope:
         self.cfg = cfg
         random.seed(cfg.seed)
         
-        os.makedirs("snapshots", exist_ok=True)
+        os.makedirs(self.cfg.snapshot_dir, exist_ok=True)
 
         self.grid = ToroidalHexGrid(cfg.width, cfg.height)
         self.occupancy: Dict[Tuple[int, int], Cell] = {}
@@ -199,8 +199,10 @@ class Evoscope:
             self.cluster_size_history[cid].append(cluster_counts[cid])
 
         if self.epoch % 5 == 0:
-            #np.save(f"snapshots/grid_{self.epoch}.npy", grid_to_numpy(self))
-            np.save(f"snapshots/grid_{self.epoch:03d}.npy", grid_to_numpy(self))
+            np.save(
+                os.path.join(self.cfg.snapshot_dir, f"grid_{self.epoch:03d}.npy"),
+                grid_to_numpy(self),
+            )            
 
 
     def _sense(self, pos: Tuple[int, int], cell: Cell) -> Dict:
