@@ -21,16 +21,36 @@ Organization: Lunan Foldomics LLC
 """
 
 from .enums import CommitmentState
+from pathlib import Path
 import csv
 
 
-def save_global_gene_csv(sim, path="global_genes.csv"):
+def _resolve_output_path(path, outdir=None):
+    """Resolve an output file path, optionally inside an output directory."""
+    path = Path(path)
+
+    if outdir is not None:
+        outdir = Path(outdir)
+        outdir.mkdir(parents=True, exist_ok=True)
+        path = outdir / path.name
+    else:
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+    return path
+
+
+def save_global_gene_csv(sim, path="global_genes.csv", outdir=None):
+    """Export system-level gene/protein histories."""
+
+    output_path = _resolve_output_path(path, outdir=outdir)
+
     genes = list(sim.gene_history.keys())
     if not genes:
-        return
+        return output_path
+
     steps = len(sim.gene_history[genes[0]])
 
-    with open(path, "w", newline="") as f:
+    with open(output_path, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["step"] + genes)
 
@@ -38,12 +58,22 @@ def save_global_gene_csv(sim, path="global_genes.csv"):
             row = [i] + [sim.gene_history[g][i] for g in genes]
             writer.writerow(row)
 
+    return output_path
 
-def save_cluster_gene_csv(sim, path="cluster_genes.csv"):
+
+def save_cluster_gene_csv(sim, path="cluster_genes.csv", outdir=None):
+    """Export cluster-resolved gene/protein histories."""
+
+    output_path = _resolve_output_path(path, outdir=outdir)
+
     genes = ["T1", "T2", "I", "R", "M", "K", "S"]
+
+    if not hasattr(sim, "cluster_gene_history") or not sim.cluster_gene_history:
+        return output_path
+
     steps = len(sim.cluster_gene_history[0][genes[0]])
 
-    with open(path, "w", newline="") as f:
+    with open(output_path, "w", newline="") as f:
         writer = csv.writer(f)
         header = ["step", "cluster", "size"] + genes
         writer.writerow(header)
@@ -55,21 +85,22 @@ def save_cluster_gene_csv(sim, path="cluster_genes.csv"):
                     row.append(sim.cluster_gene_history[cid][g][i])
                 writer.writerow(row)
 
+    return output_path
 
 
-def save_population_metrics_csv(sim, path="population_metrics.csv"):
+def save_population_metrics_csv(sim, path="population_metrics.csv", outdir=None):
     """Export population-level covariates for representation-learning controls.
 
-    This file is intended to support interpretation of latent trajectories by
-    recording simple demographic and occupancy variables over time. It does not
-    alter the simulation dynamics and is not used as an autoencoder target.
+    This file supports interpretation of latent trajectories by recording simple
+    demographic, occupancy, and cluster-composition variables over time. It does
+    not alter the simulation dynamics and is not used as an autoencoder target.
     """
 
-    # The core histories are already accumulated during simulation.
-    # We use their length to determine how many sampled steps were exported.
+    output_path = _resolve_output_path(path, outdir=outdir)
+
     genes = list(sim.gene_history.keys())
     if not genes:
-        return
+        return output_path
 
     steps = len(sim.gene_history[genes[0]])
     lattice_sites = sim.cfg.width * sim.cfg.height
@@ -91,7 +122,7 @@ def save_population_metrics_csv(sim, path="population_metrics.csv"):
         "largest_cluster",
     ] + [f"cluster_{cid}_size" for cid in range(8)]
 
-    with open(path, "w", newline="") as f:
+    with open(output_path, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(header)
 
@@ -103,34 +134,38 @@ def save_population_metrics_csv(sim, path="population_metrics.csv"):
 
             committed_cells = sum(cluster_sizes)
 
-            # When available, use metrics_history for total population size.
-            # This records all occupied cells, including undetermined and
-            # decommitted cells.
             if i < len(sim.metrics_history):
-                total_cells = int(sim.metrics_history[i].get("alive", committed_cells))
-                n_clusters_present = int(sim.metrics_history[i].get("n_clusters_present", 0))
-                largest_cluster = int(sim.metrics_history[i].get("largest_cluster", max(cluster_sizes) if cluster_sizes else 0))
+                metrics = sim.metrics_history[i]
+                total_cells = int(metrics.get("alive", committed_cells))
+                undetermined_cells = int(metrics.get("undetermined", 0))
+                decommitted_cells = int(metrics.get("decommitted", 0))
+                n_clusters_present = int(
+                    metrics.get(
+                        "n_clusters_present",
+                        sum(1 for s in cluster_sizes if s > 0),
+                    )
+                )
+                largest_cluster = int(
+                    metrics.get(
+                        "largest_cluster",
+                        max(cluster_sizes) if cluster_sizes else 0,
+                    )
+                )
             else:
                 total_cells = committed_cells
+                undetermined_cells = 0
+                decommitted_cells = 0
                 n_clusters_present = sum(1 for s in cluster_sizes if s > 0)
                 largest_cluster = max(cluster_sizes) if cluster_sizes else 0
 
             empty_sites = lattice_sites - total_cells
             uncommitted_cells = total_cells - committed_cells
 
-            # The current histories do not separately store undetermined and
-            # decommitted counts over past time steps. We therefore export the
-            # combined uncommitted count and leave the separated fields empty.
-
-            undetermined_cells = int(sim.metrics_history[i].get("undetermined", 0))
-            decommitted_cells = int(sim.metrics_history[i].get("decommitted", 0))
-
             occupied_density = total_cells / lattice_sites if lattice_sites else 0.0
             committed_density = committed_cells / lattice_sites if lattice_sites else 0.0
-            uncommitted_density = uncommitted_cells / lattice_sites if lattice_sites else 0.0
-
             undetermined_density = undetermined_cells / lattice_sites if lattice_sites else 0.0
             decommitted_density = decommitted_cells / lattice_sites if lattice_sites else 0.0
+            uncommitted_density = uncommitted_cells / lattice_sites if lattice_sites else 0.0
 
             row = [
                 i,
@@ -150,3 +185,6 @@ def save_population_metrics_csv(sim, path="population_metrics.csv"):
             ] + cluster_sizes
 
             writer.writerow(row)
+
+    return output_path
+
