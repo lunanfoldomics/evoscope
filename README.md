@@ -149,7 +149,6 @@ python -m evoscope.cli --width 60 --height 40 --seed 38 --epochs 120 --initial_c
 
 Each run exports:
 
-- console summaries
 - ASCII frame dumps
 - snapshot arrays
 - global_genes.csv (global gene trajectories)
