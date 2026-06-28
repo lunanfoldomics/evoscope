@@ -35,9 +35,7 @@ r13_outputs/
 
 Usage:
 
-python r13_autoencoder_compare.py --root runs --outdir r13_outputs --device auto  
-or if you want more speed...
-python r13_autoencoder_compare.py --root runs --outdir r13_outputs --device cuda --batch-size 32
+python r13_autoencoder_compare.py --root runs --outdir outputs --device auto  
 
 """
 
