@@ -269,7 +269,7 @@ Then run the correlation script.
 **Global-gene correlation**
 
 ```bash
-python ../code/correlation_global-or-cluster_latents_and_genes.py \
+python ../code/correlation_global_or_cluster_latents_and_genes \
     --latents global_ae_outputs/latents.csv \
     --metrics global_genes.csv
 ```
