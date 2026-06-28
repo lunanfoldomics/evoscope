@@ -30,7 +30,7 @@ r13_outputs/
 
 Usage:
 
-python r13_baseline_controls.py --root runs --outdir r13_outputs  
+python r13_baseline_controls.py --root runs --outdir outputs  
 
 """
 
