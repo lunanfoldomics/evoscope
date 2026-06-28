@@ -277,7 +277,7 @@ python ../code/correlation_global_or_cluster_latents_and_genes \
 **Cluster-gene correlation**
 
 ```bash
-python ../code/correlation_global-or-cluster_latents_and_genes.py \
+python ../code/correlation_global_or_cluster_latents_and_genes.py \
     --latents cluster_ae_outputs/latents.csv \
     --metrics cluster_genes.csv
 ```
