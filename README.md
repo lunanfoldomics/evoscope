@@ -126,7 +126,6 @@ The revised Evoscope codebase is distributed as an installable Python package.
 From the `code/` directory, install in editable mode:
 
 ```bash
-cd evoscope/code
 python -m pip install -e .
 ```
 
