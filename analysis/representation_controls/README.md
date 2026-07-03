@@ -39,3 +39,12 @@ Outputs
 The scripts generate CSV files summarizing held-out performance using MAE, RMSE, R², and mean Pearson correlation across the seven global regulatory variables.
 
 These outputs correspond to the baseline-control results reported in Supplementary Table S1.
+```
+
+## Examples
+
+```bash
+python ../analysis/representation_controls/r13_baseline_controls.py --root runs --outdir analysis/representation_controls/outputs
+python ../analysis/representation_controls/r13_autoencoder_compare.py --root runs --outdir analysis/representation_controls/outputs --device auto
+python ../analysis/representation_controls/r22_latent_temporal_prediction.py --runs_dir runs  --output_dir analysis/representation_controls/outputs  
+```
