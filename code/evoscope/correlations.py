@@ -10,7 +10,8 @@ heatmaps.
 The goal is to help interpret what each latent dimension captures about the
 emergent morphology-regulation relationship in Evoscope simulations.
 
-Evoscope v0.9.2
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
