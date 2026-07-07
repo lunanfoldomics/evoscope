@@ -10,7 +10,8 @@ After the simulation completes, the CLI exports ASCII frames, prints a final
 summary, saves global and cluster-level gene/protein CSV files, and can
 optionally generate diagnostic plots.
 
-Evoscope v0.9.2
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
