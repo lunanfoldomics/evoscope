@@ -11,7 +11,9 @@ including inheritance of regulatory variables, energy partitioning, and
 small stochastic perturbations of directional proteins. This provides the
 local state substrate on which the higher-level Evoscope simulation operates.
 
-Evoscope v0.9.2
+
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
