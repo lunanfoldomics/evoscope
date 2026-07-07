@@ -12,7 +12,9 @@ device resolution, history export, latent export, and prediction export. It
 can be used both as a command-line script and as an importable training module
 inside notebooks or larger workflows.
 
-Evoscope v0.9.1
+
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
