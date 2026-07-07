@@ -10,7 +10,9 @@ These functions are intended for exploratory analysis, quality control,
 figure generation, and rapid inspection of how local regulatory rules produce
 emergent spatial organization over time.
 
-Evoscope v0.9.2
+
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
