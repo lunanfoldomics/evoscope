@@ -11,7 +11,8 @@ morphology and downstream machine-learning models, enabling latent-space
 learning of tissue-like organization and its relationship to regulatory
 dynamics.
 
-Evoscope v0.9.2
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
