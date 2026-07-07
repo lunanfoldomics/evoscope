@@ -10,7 +10,8 @@ attractor-like phase portraits.
 These plots are designed to help interpret whether simulated morphologies
 move through stable, cyclic, transient, or divergent regions of latent space.
 
-Evoscope v0.9.2
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
