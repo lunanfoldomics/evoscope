@@ -11,7 +11,8 @@ of the model explicit, editable, and reproducible. A `Config` instance is
 passed to the main Evoscope simulation engine and determines the initial
 conditions and dynamical rules of each run.
 
-Evoscope v0.9.2
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
