@@ -16,7 +16,9 @@ visualization and downstream analysis.
 Conceptually, this module is the dynamical core of Evoscope: it links local
 regulatory rules to emergent spatial organization.
 
-Evoscope v0.9.2
+
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
