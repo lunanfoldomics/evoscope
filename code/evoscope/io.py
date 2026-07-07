@@ -15,7 +15,9 @@ cluster_genes.csv
     Cluster-specific expression values and cluster sizes over simulation
     steps.
 
-Evoscope v0.9.2
+
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
