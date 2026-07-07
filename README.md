@@ -2,7 +2,15 @@
 
 # Evoscope
 
-*A minimal multicellular simulation framework for emergent mesoscopic organization and latent-state discovery.*
+**Evoscope v0.9.2**  
+*A minimal regulatory spatial model for emergent multicellular organization.*
+
+**Author:** Luca Zammataro  
+**Organization:** Lunan Foldomics LLC
+
+Evoscope is a Python package for simulating emergent multicellular organization from a minimal regulatory grammar coupling nutrient uptake, adhesion, motility, competition, protection, and heritable identity commitment on a toroidal hexagonal lattice.
+
+This repository contains the version aligned with the revised manuscript and supplementary representation-control analyses.
 
 ---
 
