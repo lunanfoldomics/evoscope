@@ -15,12 +15,11 @@ Evoscope — minimal regulatory spatial model for emergent multicellular organiz
 
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
+"""
 
 __version__ = "0.9.2"
 __author__ = "Luca Zammataro"
 __organization__ = "Lunan Foldomics LLC"
-
-"""
 
 from .config import Config
 from .simulation import Evoscope
