@@ -18,7 +18,9 @@ ActionType
     Defines the possible actions selected during the planning phase of each
     simulation step.
 
-Evoscope v0.9.2
+    
+Evoscope — minimal regulatory spatial model for emergent multicellular organization.
+
 Author: Luca Zammataro
 Organization: Lunan Foldomics LLC
 """
