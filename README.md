@@ -221,7 +221,6 @@ ASCII snapshots remain particularly useful for interpreting cluster identities a
 
 ## Multi-run aggregation
 
-Aggregated plots and summary tables across multiple runs:
 Run `aggregate_evoscope.py` from the repository root, or from the directory containing the `runs/` folder with your simulation outputs:
 
 ```bash
