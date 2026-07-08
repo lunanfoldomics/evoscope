@@ -226,6 +226,7 @@ Run `aggregate_evoscope.py` from the repository root, or from the directory cont
 ```bash
 python code/aggregate_evoscope.py --root runs --outdir runs/aggregated_outputs
 ```
+
 Here, `--root runs` points to the directory containing the individual simulation folders, and `--outdir runs/aggregated_outputs` specifies where the aggregated outputs will be written.
 
 This can be used to compute:
@@ -255,11 +256,12 @@ Evoscope supports two autoencoder workflows for latent-variable discovery:
 ### Global-gene mode
 
 ```bash
-python ../code/torhex_autoencoder.py \
-    --snapshots_dir snapshots \
-    --global_csv global_genes.csv \
-    --target_mode global \
-    --epochs 100
+python code/torhex_autoencoder.py  \
+	--snapshots_dir runs/seed_42/snapshots \
+	--global_csv runs/seed_42/global_genes.csv  \
+	--target_mode global \
+	--epochs 100 \
+	--outdir runs/seed_42/global_ae_output
 ```
 
 ### Cluster-gene mode
