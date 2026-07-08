@@ -13,7 +13,7 @@ The analyses compare morphology-derived representations with simpler baseline mo
 
 ## Expected input structure
 
-The scripts expect simulation outputs organized as:
+The scripts expect simulation outputs organized as in `evoscope/random_seed_examples` directory:
 
 ```text
 runs/
@@ -28,18 +28,21 @@ runs/
 ├── seed_40/
 │   └── ...
 └── ...
+```
 
 The held-out seed split used in the revised manuscript is:
 
+```text
 Train:      38, 40, 53, 65, 89, 90
 Validation: 96, 101
 Test:       104, 107
-Outputs
+```
+
+## Outputs
 
 The scripts generate CSV files summarizing held-out performance using MAE, RMSE, R², and mean Pearson correlation across the seven global regulatory variables.
 
 These outputs correspond to the baseline-control results reported in Supplementary Table S1.
-```
 
 ## Examples
 
