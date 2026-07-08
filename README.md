@@ -102,20 +102,19 @@ This makes Evoscope relevant both to theoretical biology and to the development 
 
 ## Repository structure
 
-- `code/evoscope/` — installable Evoscope Python package, including the core simulation engine, CLI, exporters, autoencoder utilities, latent-space analysis, correlation analysis, plotting, and visualization modules.
-- `code/*.py` — standalone workflow scripts used for simulation aggregation, autoencoder training, latent–observable correlation analysis, plotting, and interactive visualization.
-- `examples/` — example random-seed simulation utilities and example outputs.
-- `analysis/representation_controls/` — scripts used for the held-out seed, baseline-control, and latent temporal prediction analyses reported in the revised manuscript and Supplementary Information.
-- `notebooks/` — teaching and exploratory notebooks.
-- `images/` — logos, thumbnails, and illustrative figures.
+The repository is organized around the `code/` directory, which contains both the installable Evoscope package and the standalone workflow scripts used in the manuscript analyses.
 
+- `code/evoscope/` — installable Python package containing the core simulation framework, command-line interface, data exporters, autoencoder utilities, latent-space analysis, correlation analysis, plotting, and visualization modules.
+- `code/torhex_autoencoder.py` — standalone autoencoder workflow script used for global and cluster-resolved morphology-to-regulation analyses.
+- `code/correlation_global_or_cluster_latents_and_genes.py` — standalone workflow script for latent–observable correlation analysis.
+- `code/aggregate_evoscope.py` — standalone workflow script for aggregating simulation outputs across runs.
+- `code/viewer.py` — interactive viewer for inspecting simulation snapshots.
+- `code/pyproject.toml` — package metadata and installation configuration.
+- `examples/` — random-seed simulation utilities and example outputs.
+- `analysis/representation_controls/` — held-out seed, baseline-control, and latent temporal prediction analyses added for the revised manuscript and Supplementary Information.
 
+The reusable package API is contained in `code/evoscope/`, while selected top-level scripts in `code/` are retained as explicit manuscript-analysis and visualization workflows.
 
-## Code organization
-
-The installable Evoscope package is located under `code/evoscope/`. This package contains the core simulation engine together with reusable modules for morphology encoding, autoencoder-based representation learning, latent-space utilities, correlations, plotting, and visualization.
-
-Several standalone scripts are kept at the top level of `code/` because they reproduce the analysis workflows used for the manuscript, including autoencoder training, latent–observable correlations, aggregation of simulation outputs, figure generation, and interactive visualization. These scripts are intentionally kept as reproducibility entry points rather than being fully absorbed into the package API.
 
 ---
 
