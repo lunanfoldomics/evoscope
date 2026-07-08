@@ -100,7 +100,7 @@ This makes Evoscope relevant both to theoretical biology and to the development 
 
 
 
-# Repository structure
+## Repository structure
 
 A typical repository layout may include:
 
@@ -112,7 +112,7 @@ A typical repository layout may include:
 Adapt these paths as needed for your local setup.
 
 
-# Code organization
+## Code organization
 
 The installable Evoscope package is located under `code/evoscope/`. This package contains the core simulation engine together with reusable modules for morphology encoding, autoencoder-based representation learning, latent-space utilities, correlations, plotting, and visualization.
 
@@ -120,7 +120,7 @@ Several standalone scripts are kept at the top level of `code/` because they rep
 
 ---
 
-## Installation
+# Installation
 
 Clone the repository and install the required Python packages:
 
