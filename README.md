@@ -224,9 +224,9 @@ ASCII snapshots remain particularly useful for interpreting cluster identities a
 Run `aggregate_evoscope.py` from the repository root, or from the directory containing the `runs/` folder with your simulation outputs:
 
 ```bash
-python code/aggregate_evoscope.py --root runs --outdir aggregated_outputs
+python code/aggregate_evoscope.py --root runs --outdir runs/aggregated_outputs
 ```
-Here, `--root runs` points to the directory containing the individual simulation folders, and `--outdir` aggregated_outputs specifies where the aggregated outputs will be written.
+Here, `--root runs` points to the directory containing the individual simulation folders, and `--outdir runs/aggregated_outputs` specifies where the aggregated outputs will be written.
 
 This can be used to compute:
 
