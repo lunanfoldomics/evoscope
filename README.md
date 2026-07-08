@@ -271,7 +271,7 @@ python code/torhex_autoencoder.py  \
 	--snapshots_dir runs/seed_42/snapshots \
 	--cluster_csv runs/seed_42/cluster_genes.csv \
 	--target_mode cluster_flat \
-	--epochs 100   \
+	--epochs 100  \
 	--outdir runs/seed_42/cluster_ae_output
 ```
 
