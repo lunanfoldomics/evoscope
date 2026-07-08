@@ -13,7 +13,7 @@ The analyses compare morphology-derived representations with simpler baseline mo
 
 ## Expected input structure
 
-The scripts expect simulation outputs organized as in `evoscope/random_seed_examples` directory:
+The scripts expect simulation outputs organized as in `evoscope/examples` directory, which contains random seed examples:
 
 ```text
 runs/
@@ -47,6 +47,7 @@ These outputs correspond to the baseline-control results reported in Supplementa
 ## Examples
 
 ```bash
+
 python ../analysis/representation_controls/r13_baseline_controls.py --root runs --outdir analysis/representation_controls/outputs
 python ../analysis/representation_controls/r13_autoencoder_compare.py --root runs --outdir analysis/representation_controls/outputs --device auto
 python ../analysis/representation_controls/r22_latent_temporal_prediction.py --runs_dir runs  --output_dir analysis/representation_controls/outputs  
