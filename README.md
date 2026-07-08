@@ -151,13 +151,13 @@ The representative simulation used in the manuscript can be reproduced with:
 
 
 ```bash
-evoscope --width 60 --height 40 --seed 42 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_38
+evoscope --width 60 --height 40 --seed 42 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_42
 ```
 
 or
 
 ```bash
-python -m evoscope.cli --width 60 --height 40 --seed 42 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_38
+python -m evoscope.cli --width 60 --height 40 --seed 42 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_42
 ```
 
 Each run exports:
