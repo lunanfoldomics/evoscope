@@ -18,7 +18,7 @@ This repository contains the version aligned with the revised manuscript and sup
 
 The framework is built around a spatial agent-based model in which cells evolve on a toroidal hexagonal lattice coupled to a nutrient field. Each cell is governed by a compact regulatory program controlling nutrient uptake, adhesion, motility, competition, protection, and identity commitment. Despite this minimal design, the system generates rich multicellular behaviors, including aggregate formation, territorial expansion, differentiated colonies, ecological trade-offs, collective movement, and eventual collapse under stress.
 
-A central idea behind Evoscope is that multicellular form is not merely a visible outcome, but a **mesoscopic state** linking intracellular regulation to tissue-scale organization. To explore this, Evoscope also serves as a controlled testbed for **representation learning**: autoencoders are trained on simulation snapshots to test whether morphology alone contains enough information to recover hidden internal regulatory structure.
+A central idea behind Evoscope is that multicellular form is not merely a visible outcome, but a **mesoscopic state** linking intracellular regulation to tissue-scale organization. To explore this, Evoscope also serves as a controlled testbed for **representation learning**: autoencoders are trained on simulation snapshots to test whether morphology alone retains partial, recoverable information about the internal regulatory state that generated it.
 
 In this sense, Evoscope serves two purposes at once:
 
@@ -146,13 +146,13 @@ The representative simulation used in the manuscript can be reproduced with:
 
 
 ```bash
-evoscope --width 60 --height 40 --seed 38 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_38
+evoscope --width 60 --height 40 --seed 42 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_38
 ```
 
 or
 
 ```bash
-python -m evoscope.cli --width 60 --height 40 --seed 38 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_38
+python -m evoscope.cli --width 60 --height 40 --seed 42 --epochs 120 --initial_cells 30 --nutrient 6.9 --outdir runs/seed_38
 ```
 
 Each run exports:
@@ -341,7 +341,7 @@ A self-contained teaching notebook is available in:
 notebooks/01_evoscope_teaching_intro.ipynb
 ```
 
-The notebook provides an interactive walkthrough of the Evoscope simulation, gene-dynamics export, autoencoder training, latent-variable extraction, correlation analysis, and attractor visualization.
+The notebook provides an interactive walkthrough of the Evoscope simulation, gene-dynamics export, autoencoder training, latent-variable extraction, correlation analysis, and latent-space visualization.
 
 ---
 
