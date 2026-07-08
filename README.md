@@ -267,11 +267,12 @@ python code/torhex_autoencoder.py  \
 ### Cluster-gene mode
 
 ```bash
-python ../code/torhex_autoencoder.py \
-    --snapshots_dir snapshots \
-    --cluster_csv cluster_genes.csv \
-    --target_mode cluster_flat \
-    --epochs 100
+python code/torhex_autoencoder.py  \
+	--snapshots_dir runs/seed_42/snapshots \
+	--cluster_csv runs/seed_42/cluster_genes.csv \
+	--target_mode cluster_flat \
+	--epochs 100   \
+	--outdir runs/seed_42/cluster_ae_output
 ```
 
 ### Latent–gene correlation analysis
