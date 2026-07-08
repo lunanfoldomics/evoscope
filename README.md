@@ -102,14 +102,13 @@ This makes Evoscope relevant both to theoretical biology and to the development 
 
 ## Repository structure
 
-A typical repository layout may include:
+- `code/evoscope/` — installable Evoscope Python package, including the core simulation engine, CLI, exporters, autoencoder utilities, latent-space analysis, correlation analysis, plotting, and visualization modules.
+- `code/*.py` — standalone workflow scripts used for simulation aggregation, autoencoder training, latent–observable correlation analysis, plotting, and interactive visualization.
+- `examples/` — example random-seed simulation utilities and example outputs.
+- `analysis/representation_controls/` — scripts used for the held-out seed, baseline-control, and latent temporal prediction analyses reported in the revised manuscript and Supplementary Information.
+- `notebooks/` — teaching and exploratory notebooks.
+- `images/` — logos, thumbnails, and illustrative figures.
 
-- `code/` — simulation, aggregation, and autoencoder scripts;
-- `images/` — logos, thumbnails, and illustrative figures;
-- `runs/` — simulation outputs from batch experiments;
-- `aggregated_outputs/` — summary results across multiple seeds.
-
-Adapt these paths as needed for your local setup.
 
 
 ## Code organization
