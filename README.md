@@ -287,9 +287,11 @@ Then run the correlation script.
 **Global-gene correlation**
 
 ```bash
-python code/correlation_global_or_cluster_latents_and_genes.py  \
-	--latents runs/seed_42/global_ae_outputs/latents.csv  \
-	--metrics runs/seed_42/global_genes.csv 
+python code/correlation_global_or_cluster_latents_and_genes.py \
+	--latents runs/seed_42/global_ae_outputs/latents.csv \
+	--metrics runs/seed_42/global_genes.csv \
+	--outfile runs/seed_42/global_ae_outputs/global_latent_heatmap.png \
+	--title Global_Latent_Heatmap
 ```
 
 **Cluster-gene correlation**
@@ -297,7 +299,9 @@ python code/correlation_global_or_cluster_latents_and_genes.py  \
 ```bash
 python code/correlation_global_or_cluster_latents_and_genes.py  \
     --latents runs/seed_42/cluster_ae_outputs/latents.csv \
-    --metrics runs/seed_42/cluster_genes.csv
+    --metrics runs/seed_42/cluster_genes.csv \
+	--outfile runs/seed_42/cluster_ae_outputs/cluster_latent_heatmap.png \
+	--title Cluster_Latent_Heatmap
 ```
 
 This analysis typically produces:
