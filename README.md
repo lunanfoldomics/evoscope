@@ -98,9 +98,9 @@ It is not intended to reproduce any specific organism. Instead, it asks a more f
 
 This makes Evoscope relevant both to theoretical biology and to the development of machine-learning strategies aimed at connecting morphology, regulation, and latent mesoscopic structure.
 
----
 
-## Repository structure
+
+# Repository structure
 
 A typical repository layout may include:
 
