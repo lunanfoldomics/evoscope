@@ -111,6 +111,13 @@ A typical repository layout may include:
 
 Adapt these paths as needed for your local setup.
 
+
+# Code organization
+
+The installable Evoscope package is located under `code/evoscope/`. This package contains the core simulation engine together with reusable modules for morphology encoding, autoencoder-based representation learning, latent-space utilities, correlations, plotting, and visualization.
+
+Several standalone scripts are kept at the top level of `code/` because they reproduce the analysis workflows used for the manuscript, including autoencoder training, latent–observable correlations, aggregation of simulation outputs, figure generation, and interactive visualization. These scripts are intentionally kept as reproducibility entry points rather than being fully absorbed into the package API.
+
 ---
 
 ## Installation
