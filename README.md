@@ -203,10 +203,11 @@ If launched from a directory containing the snapshot files of a simulation run, 
 - inspect multicellular morphologies in a high-resolution visual format;
 - facilitate figure generation for manuscripts and supplementary materials.
 
-To launch the viewer:
+To launch the viewer for runs/seed_42/:
 
 ```bash
-python ../code/viewer.py
+cd cd runs/seed_42/
+python ../../code/viewer.py
 ```
 
 ![Evoscope interactive viewer](images/viewer_example.png)
@@ -220,17 +221,20 @@ ASCII snapshots remain particularly useful for interpreting cluster identities a
 
 ## Multi-run aggregation
 
-Aggregated plots and summary tables across multiple runs can then be generated with:
+Aggregated plots and summary tables across multiple runs:
+Run `aggregate_evoscope.py` from the repository root, or from the directory containing the `runs/` folder with your simulation outputs:
 
 ```bash
-python ../code/aggregate_evoscope.py --root runs --outdir aggregated_outputs
+python code/aggregate_evoscope.py --root runs --outdir aggregated_outputs
 ```
+Here, `--root runs` points to the directory containing the individual simulation folders, and `--outdir` aggregated_outputs specifies where the aggregated outputs will be written.
 
 This can be used to compute:
 
 mean ± standard deviation of global gene trajectories;
 mean ± standard deviation of cluster-resolved gene trajectories;
 multi-experiment summary figures.
+
 
 ### Example aggregation outputs
 
