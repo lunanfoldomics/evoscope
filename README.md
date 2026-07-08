@@ -261,7 +261,7 @@ python code/torhex_autoencoder.py  \
 	--global_csv runs/seed_42/global_genes.csv  \
 	--target_mode global \
 	--epochs 100 \
-	--outdir runs/seed_42/global_ae_output
+	--outdir runs/seed_42/global_ae_outputs
 ```
 
 ### Cluster-gene mode
@@ -272,12 +272,12 @@ python code/torhex_autoencoder.py  \
 	--cluster_csv runs/seed_42/cluster_genes.csv \
 	--target_mode cluster_flat \
 	--epochs 100  \
-	--outdir runs/seed_42/cluster_ae_output
+	--outdir runs/seed_42/cluster_ae_outputs
 ```
 
 ### Latent–gene correlation analysis
 
-Each autoencoder run produces an output folder named `ae_output`. Rename it according to the workflow:
+Each autoencoder run produces an output folder: 
 
 * `global_ae_outputs` for global-gene runs
 * `cluster_ae_outputs` for cluster-gene runs
@@ -287,17 +287,17 @@ Then run the correlation script.
 **Global-gene correlation**
 
 ```bash
-python ../code/correlation_global_or_cluster_latents_and_genes.py \
-    --latents global_ae_outputs/latents.csv \
-    --metrics global_genes.csv
+python code/correlation_global_or_cluster_latents_and_genes.py  \
+	--latents runs/seed_42/global_ae_outputs/latents.csv  \
+	--metrics runs/seed_42/global_genes.csv 
 ```
 
 **Cluster-gene correlation**
 
 ```bash
-python ../code/correlation_global_or_cluster_latents_and_genes.py \
-    --latents cluster_ae_outputs/latents.csv \
-    --metrics cluster_genes.csv
+python code/correlation_global_or_cluster_latents_and_genes.py  \
+    --latents runs/seed_42/cluster_ae_outputs/latents.csv \
+    --metrics runs/seed_42/cluster_genes.csv
 ```
 
 This analysis typically produces:
