@@ -120,7 +120,7 @@ Several standalone scripts are kept at the top level of `code/` because they rep
 
 ---
 
-# Installation
+## Installation
 
 Clone the repository and install the required Python packages:
 
