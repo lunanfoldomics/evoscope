@@ -42,7 +42,7 @@ Test:       104, 107
 
 The scripts generate CSV files summarizing held-out performance using MAE, RMSE, R², and mean Pearson correlation across the seven global regulatory variables.
 
-These outputs correspond to the baseline-control results reported in Supplementary Table S1.
+These outputs correspond to the baseline-control results reported in Supplementary Table S1 and S2.
 
 ## Examples
 
