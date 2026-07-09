@@ -57,8 +57,20 @@ These outputs correspond to the baseline-control results reported in Supplementa
 
 ```bash
 
-python analysis/representation_controls/r13_baseline_controls.py  --root examples/runs --outdir examples/analysis/representation_controls/outputs/
-python analysis/representation_controls/r13_autoencoder_compare.py --root examples/runs --outdir examples/analysis/representation_controls/outputs --device auto
-python analysis/representation_controls/r22_latent_temporal_prediction.py --runs_dir examples/runs  --output_dir examples/analysis/representation_controls/outputs  
+python analysis/representation_controls/r13_baseline_controls.py  \
+  --root examples/runs \
+  --outdir examples/analysis/representation_controls/outputs/
+
+
+python analysis/representation_controls/r13_autoencoder_compare.py \
+  --root examples/runs \
+  --outdir examples/analysis/representation_controls/outputs \
+  --device auto
+
+
+python analysis/representation_controls/r22_latent_temporal_prediction.py \
+  --runs_dir examples/runs  \
+  --output_dir examples/analysis/representation_controls/outputs
+ 
 ```
 
