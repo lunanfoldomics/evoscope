@@ -15,6 +15,7 @@ The analyses compare morphology-derived representations with simpler baseline mo
 - temporal persistence baselines at t+1 and t+5
 
 
+
 ## Expected input structure
 
 
@@ -36,6 +37,7 @@ runs/
 ```
 
 
+
 The held-out seed split used in the revised manuscript is:
 
 
@@ -46,11 +48,12 @@ Test:       104, 107
 ```
 
 
+
 ## Outputs
 
 The scripts generate CSV files summarizing held-out performance using MAE, RMSE, R², and mean Pearson correlation across the seven global regulatory variables.
 
-These outputs correspond to the baseline-control results reported in Supplementary Table S1 and the latent temporal prediction controls reported in Supplementary Table S2.
+
 
 
 ## Examples
@@ -74,3 +77,13 @@ python analysis/representation_controls/r22_latent_temporal_prediction.py \
  
 ```
 
+
+## Manuscript reference outputs
+
+The output files used for the revised manuscript and Supplementary Information are provided in this directory:
+
+`analysis/representation_controls/`
+
+These committed outputs correspond to Supplementary Tables S1 and S2 and should be considered the manuscript reference results.
+
+Because autoencoder training involves stochastic initialization and backend-dependent numerical variation, re-running the analyses may lead to minor numerical differences, especially for the autoencoder prediction-head and autoencoder latent z8 + ridge outputs. Newly generated outputs should therefore be interpreted as reproducibility checks rather than exact byte-for-byte reproductions of the Supplementary Information.
