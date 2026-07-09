@@ -89,4 +89,4 @@ The output files used for the revised manuscript and Supplementary Information a
 
 These committed outputs correspond to Supplementary Tables S1 and S2 and should be considered the manuscript reference results.
 
-Because autoencoder training involves stochastic initialization and backend-dependent numerical variation, re-running the analyses may lead to minor numerical differences, especially for the autoencoder prediction-head and autoencoder latent z8 + ridge outputs. Newly generated outputs should therefore be interpreted as reproducibility checks rather than exact byte-for-byte reproductions of the Supplementary Information.
+Because autoencoder training involves stochastic initialization and backend-dependent numerical variation, re-running the analyses may produce minor numerical differences, especially for the autoencoder prediction-head and autoencoder latent z8 + ridge outputs. Newly generated outputs should therefore be interpreted as reproducibility checks rather than exact byte-for-byte reproductions of the Supplementary Information.
