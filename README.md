@@ -360,15 +360,11 @@ The notebook provides an interactive walkthrough of the Evoscope simulation, gen
 
 ---
 
+
 ## Revision analysis scripts
 
-Additional scripts used for the held-out seed and baseline-control analyses reported in the revised manuscript are provided in:
+The scripts used for the representation-control analyses added during revision are provided under [`analysis/representation_controls/`](analysis/representation_controls/). This directory includes dedicated documentation describing the expected input structure, example commands, held-out seed split, and manuscript reference outputs corresponding to Supplementary Tables S1 and S2.
 
-```text
-analysis/representation_controls/
-```
-
-These scripts reproduce the comparisons between coarse population-level covariates, PCA-based morphology representations, autoencoder latent representations, autoencoder prediction heads, and temporal persistence baselines.
 
 ---
 
