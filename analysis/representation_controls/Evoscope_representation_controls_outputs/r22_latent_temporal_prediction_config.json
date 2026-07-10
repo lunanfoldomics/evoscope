@@ -1,0 +1,25 @@
+{
+  "train_seeds": [
+    38,
+    40,
+    53,
+    65,
+    89,
+    90
+  ],
+  "val_seeds": [
+    96,
+    101
+  ],
+  "test_seeds": [
+    104,
+    107
+  ],
+  "horizons": [
+    1,
+    5,
+    10
+  ],
+  "latent_dim": 8,
+  "ridge_alpha": 1.0
+}

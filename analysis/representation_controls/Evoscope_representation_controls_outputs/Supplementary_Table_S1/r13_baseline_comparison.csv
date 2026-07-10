@@ -1,0 +1,5 @@
+model,input,target,split,MAE,RMSE,R2,Pearson_mean,PCA_explained_variance,horizon
+coarse_covariates_ridge,population_metrics,global_regulatory_variables,held_out_seed,0.211602775829597,0.3204823168137793,-0.4679837814118298,0.5900556635459838,,
+pca8_morphology_ridge,flattened_morphology_PCA8,global_regulatory_variables,held_out_seed,0.1346017763956397,0.2009840162046095,0.42265400823634436,0.7415699800812099,0.32605793033409036,
+persistence_t_plus_1,current_regulatory_state,future_global_regulatory_variables,held_out_seed,0.015811664553911406,0.053898763205023396,0.9586451551078348,0.9818063827033129,,1.0
+persistence_t_plus_5,current_regulatory_state,future_global_regulatory_variables,held_out_seed,0.06054953820099025,0.12114458752787956,0.7928142878252645,0.906957671426612,,5.0

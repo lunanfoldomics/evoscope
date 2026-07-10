@@ -1,0 +1,7 @@
+model,input,target,split,MAE,RMSE,R2,Pearson_mean,PCA_explained_variance,horizon
+coarse_covariates_ridge,population_metrics,global_regulatory_variables,held_out_seed,0.211602775829597,0.3204823168137793,-0.4679837814118298,0.5900556635459838,,
+pca8_morphology_ridge,flattened_morphology_PCA8,global_regulatory_variables,held_out_seed,0.1346017763956397,0.2009840162046095,0.4226540082363443,0.7415699800812099,0.3260579303340903,
+persistence_t_plus_1,current_regulatory_state,future_global_regulatory_variables,held_out_seed,0.0158116645539114,0.0538987632050233,0.9586451551078348,0.9818063827033128,,1.0
+persistence_t_plus_5,current_regulatory_state,future_global_regulatory_variables,held_out_seed,0.0605495382009902,0.1211445875278795,0.7928142878252645,0.906957671426612,,5.0
+autoencoder_prediction_head,morphology_autoencoder,global_regulatory_variables,held_out_seed,0.14572295546531677,0.20401071050462233,0.4051342308521271,0.7623310284229675,,
+autoencoder_z8_ridge,autoencoder_latent_z8,global_regulatory_variables,held_out_seed,0.1240653470158577,0.18587426865542206,0.5061993598937988,0.8052887923926617,,

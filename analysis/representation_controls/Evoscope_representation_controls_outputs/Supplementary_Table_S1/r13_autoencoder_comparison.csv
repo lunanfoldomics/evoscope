@@ -1,0 +1,3 @@
+model,input,target,split,MAE,RMSE,R2,Pearson_mean
+autoencoder_prediction_head,morphology_autoencoder,global_regulatory_variables,held_out_seed,0.14572295546531677,0.20401071050462233,0.4051342308521271,0.7623310284229675
+autoencoder_z8_ridge,autoencoder_latent_z8,global_regulatory_variables,held_out_seed,0.1240653470158577,0.18587426865542206,0.5061993598937988,0.8052887923926617
