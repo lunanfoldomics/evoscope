@@ -238,11 +238,11 @@ multi-experiment summary figures.
 
 ### Example aggregation outputs
 
-A representative example is shown below for the global regulatory variables, where mean ± standard deviation trajectories are computed across repeated runs. These aggregated trends show that the framework produces reproducible temporal programs rather than purely idiosyncratic single-run behavior.
+The figure below summarizes the aggregated temporal dynamics obtained from multiple independent Evoscope simulations performed under identical global parameters while varying only the random seed. The upper-left panel reports the global mean trajectories of the seven regulatory variables, whereas the remaining panels show the corresponding cluster-resolved trajectories for each regulatory variable. Solid lines represent the mean across simulations and shaded regions indicate ±1 standard deviation.
 
-![Aggregated global gene trajectories](images/Figure4A_global_genes.png)
+![Aggregated regulatory dynamics across simulation](images/figure4_aggregated.png)
 
-*Representative aggregated trajectories of the global regulatory variables across multiple independent simulations. Solid lines indicate mean expression across runs, and shaded regions indicate ±1 standard deviation. Cluster-resolved trajectories are presented in the associated preprint.*
+These aggregated dynamics illustrate that Evoscope produces reproducible temporal regulatory programs across independent simulations rather than idiosyncratic single-run behaviors.
 
 ---
 
