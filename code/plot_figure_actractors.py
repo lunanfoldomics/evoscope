@@ -42,7 +42,7 @@ def main():
     parser.add_argument("--cluster_latents", required=True,
                         help="CSV file with cluster latent variables")
 
-    parser.add_argument("--outfile", default="Figure4.png",
+    parser.add_argument("--outfile", default="Figure5.png",
                         help="Output image file")
 
     args = parser.parse_args()
