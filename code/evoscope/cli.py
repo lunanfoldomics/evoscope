@@ -41,6 +41,13 @@ def parse_args():
     parser.add_argument("--nutrient", type=float, default=6.9)
     parser.add_argument("--plot", type=str, default="n")
     parser.add_argument("--outdir", type=str, default=".", help="Output directory for simulation files")
+    parser.add_argument(
+        "--snapshot_every", "--snapshot-every",
+        dest="snapshot_every",
+        type=int,
+        default=1,
+        help="Save snapshots/ASCII frames every N epochs (e.g. 5 -> steps 5,10,15,...)",
+    )
     return parser.parse_args()
 
 
@@ -50,12 +57,16 @@ def main() -> None:
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
+    if args.snapshot_every < 1:
+        raise SystemExit("--snapshot_every must be an integer >= 1")
+
     cfg = Config(
         width=args.width,
         height=args.height,
         initial_cells=args.initial_cells,
         initial_medium_nutrient=args.nutrient,
         seed=args.seed,
+        snapshot_every=args.snapshot_every,
         snapshot_dir=str(outdir / "snapshots"),
         verbose=False,
     )
