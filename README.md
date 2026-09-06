@@ -362,7 +362,7 @@ for S in 1 2 3 4 5; do
     --model_seed $S \
     --split_seed 11 \
     --loader_seed 11 \
-    --outdir runs/seed_42/reviewer1/global_seed_${S}
+    --outdir runs/seed_42/initialization_robustness/global_seed_${S}
 done
 ```
 
@@ -378,7 +378,7 @@ for S in 1 2 3 4 5; do
     --model_seed $S \
     --split_seed 11 \
     --loader_seed 11 \
-    --outdir runs/seed_42/reviewer1/cluster_seed_${S}
+    --outdir runs/seed_42/initialization_robustness/cluster_seed_${S}
 done
 ```
 
@@ -388,10 +388,10 @@ The resulting latent trajectories can then be analyzed with:
 
 ```bash
 python code/autoencoder_initialization_robustness.py \
-  --base_dir runs/seed_42/reviewer1 \
+  --base_dir runs/seed_42/initialization_robustness \
   --seeds 1 2 3 4 5 \
   --reference_seed 1 \
-  --outdir runs/seed_42/reviewer1/robustness_analysis
+  --outdir runs/seed_42/initialization_robustness/robustness_analysis
 ```
 
 The analysis includes three complementary levels of comparison.
