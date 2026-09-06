@@ -387,7 +387,7 @@ These controlled retrainings vary only the model initialization seed. The datase
 The resulting latent trajectories can then be analyzed with:
 
 ```bash
-python autoencoder_initialization_robustness.py \
+python code/autoencoder_initialization_robustness.py \
   --base_dir runs/seed_42/reviewer1 \
   --seeds 1 2 3 4 5 \
   --reference_seed 1 \
