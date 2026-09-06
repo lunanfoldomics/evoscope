@@ -318,7 +318,97 @@ Representative examples of latent–gene correlation heatmaps are shown below fo
 
 This workflow produces correlation tables and heatmap visualizations that summarize the relationship between learned latent coordinates and observable regulatory variables. Representative examples from the Evoscope analyses are shown above and are discussed further in the associated preprint.
 
----
+
+### Temporal organization of morphology-derived latent representations
+
+Figure 5 of the associated manuscript (see citation below) illustrates the temporal organization of the morphology-derived latent representations learned from the representative seed-42 Evoscope simulation. 
+The figure compares the latent trajectories obtained from the global-target and cluster-resolved autoencoders.
+
+
+![Temporal organization of morphology-derived latent representations](images/Figure5.png)
+
+The manuscript Figure 5 can be regenerated directly from the corresponding autoencoder latent outputs:
+
+```bash
+python code/plot_figure5.py \
+  --global_latents runs/seed_42/global_ae_outputs/latents.csv \
+  --cluster_latents runs/seed_42/cluster_ae_outputs/latents.csv \
+  --outfile runs/seed_42/Figure5.png
+```
+
+The plotting script reconstructs the four-panel visualization reported in the manuscript, showing the temporal evolution of the learned latent coordinates and the corresponding two-dimensional trajectory projections for the global-target and cluster-resolved representations.
+
+For this analysis, morphology snapshots from the representative seed-42 simulation were recorded every five simulation epochs (--snapshot_every 5). The resulting latent trajectories therefore correspond to the sampled temporal sequence used to generate Figure 5.
+
+
+### Robustness of latent temporal organization to autoencoder initialization
+
+To assess whether the qualitative temporal organization reported in Figure 5 of the associated manuscript depends on a particular autoencoder initialization, the original Figure 5 autoencoder realization can be compared with independently initialized controlled retrainings.
+
+Because independently trained autoencoders are not expected to recover identical latent coordinate systems, reproducibility is not assessed by requiring direct axis-by-axis correspondence between z1, z2, ..., z8. 
+Instead, the analysis tests whether the relational geometry of the complete morphology-derived latent trajectories is preserved across independent autoencoder initializations.
+
+To generate controlled independent autoencoder realizations, the model initialization seed can be varied while keeping the train/validation split and minibatch ordering fixed.
+
+For the global-target autoencoder:
+
+```bash
+for S in 1 2 3 4 5; do
+  python -m evoscope.autoencoder \
+    --snapshots_dir runs/seed_42/snapshots \
+    --global_csv runs/seed_42/global_genes.csv \
+    --target_mode global \
+    --epochs 100 \
+    --model_seed $S \
+    --split_seed 11 \
+    --loader_seed 11 \
+    --outdir runs/seed_42/reviewer1/global_seed_${S}
+done
+```
+
+For the cluster-resolved autoencoder:
+
+```bash
+for S in 1 2 3 4 5; do
+  python -m evoscope.autoencoder \
+    --snapshots_dir runs/seed_42/snapshots \
+    --cluster_csv runs/seed_42/cluster_genes.csv \
+    --target_mode cluster_flat \
+    --epochs 100 \
+    --model_seed $S \
+    --split_seed 11 \
+    --loader_seed 11 \
+    --outdir runs/seed_42/reviewer1/cluster_seed_${S}
+done
+```
+
+These controlled retrainings vary only the model initialization seed. The dataset, train/validation split, minibatch ordering, autoencoder architecture, and training hyperparameters remain fixed.
+
+The resulting latent trajectories can then be analyzed with:
+
+```bash
+python autoencoder_initialization_robustness.py \
+  --base_dir runs/seed_42/reviewer1 \
+  --seeds 1 2 3 4 5 \
+  --reference_seed 1 \
+  --outdir runs/seed_42/reviewer1/robustness_analysis
+```
+
+The analysis includes three complementary levels of comparison.
+
+First, it computes the full pairwise Euclidean distance matrix among temporal states in the complete latent space for each autoencoder realization. The upper triangles of these distance matrices are then compared across independent model initializations using Pearson and Spearman correlations. This provides a coordinate-independent assessment of the relational geometry of the latent trajectories.
+
+Second, the script evaluates temporal-neighborhood preservation by comparing distances between consecutive temporal states with distances between non-consecutive states, and by measuring the relationship between temporal separation and latent-space distance.
+
+Third, the latent trajectories are aligned to a common reference using an orthogonal Procrustes transformation. The alignment is restricted to centering plus rotation/reflection and does not permit scaling or nonlinear deformation. The aligned trajectories are then projected into a common two-dimensional PCA basis defined by the reference realization for visualization.
+
+The Procrustes analysis is therefore used as an additional geometric control and visualization tool. The primary reproducibility measure is the similarity of the complete latent-space distance geometry before alignment.
+
+The script generates pairwise geometry-correlation tables, temporal-neighborhood metrics, Procrustes residuals, correlation heatmaps, aligned trajectory plots, projected coordinates, and a compact summary of the robustness statistics.
+
+The purpose of this analysis is not to demonstrate that independently trained autoencoders recover identical latent coordinates, but rather to test whether they preserve a common relational organization of the morphology-derived temporal states.
+
+
 ## Status
 
 This project is currently under active development.
