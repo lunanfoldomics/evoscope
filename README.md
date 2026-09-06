@@ -343,14 +343,14 @@ For this analysis, morphology snapshots from the representative seed-42 simulati
 
 ### Robustness of latent temporal organization to autoencoder initialization
 
-To assess whether the qualitative temporal organization reported in Figure 5 of the associated manuscript depends on a particular autoencoder initialization, the original Figure 5 autoencoder realization can be compared with independently initialized controlled retrainings.
+The robustness of morphology-derived latent representations to autoencoder initialization can be evaluated by training multiple independently initialized autoencoder models under otherwise identical conditions.
 
-Because independently trained autoencoders are not expected to recover identical latent coordinate systems, reproducibility is not assessed by requiring direct axis-by-axis correspondence between z1, z2, ..., z8. 
-Instead, the analysis tests whether the relational geometry of the complete morphology-derived latent trajectories is preserved across independent autoencoder initializations.
+Because independently trained autoencoders are not expected to recover identical latent coordinate systems, reproducibility is not assessed by requiring direct axis-by-axis correspondence between z1, z2, ..., z8. Instead, the analysis tests whether the relational geometry of the complete morphology-derived latent trajectories is preserved across independent autoencoder initializations.
 
 To generate controlled independent autoencoder realizations, the model initialization seed can be varied while keeping the train/validation split and minibatch ordering fixed.
 
 For the global-target autoencoder:
+
 
 ```bash
 for S in 1 2 3 4 5; do
