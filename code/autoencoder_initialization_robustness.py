@@ -1,28 +1,20 @@
 #!/usr/bin/env python3
 """
-Autoencoder initialization robustness analysis for Evoscope Figure 5.
+Autoencoder initialization robustness analysis for Evoscope.
 
-This script compares the historical Figure 5 autoencoder realization together
-with independently initialized controlled retrainings. For the controlled
-retrainings, the underlying dataset, train/validation split, and minibatch order
-are kept fixed.
+This script compares independently initialized autoencoders while keeping the
+underlying dataset, train/validation split, and minibatch order fixed.
 
 Expected directory structure
 ----------------------------
 BASE_DIR/
-    global_original/latents.csv
     global_seed_1/latents.csv
+    global_seed_2/latents.csv
     ...
     global_seed_5/latents.csv
-    cluster_original/latents.csv
     cluster_seed_1/latents.csv
     ...
     cluster_seed_5/latents.csv
-
-The historical autoencoder realization used for the manuscript Figure 5 is
-labelled ``Original``. Its historical initialization seed does not need to be
-known. It is analyzed together with the controlled retrainings, while the
-controlled runs retain their explicit labels Seed 1 ... Seed 5.
 
 Each latents.csv must contain:
     step,z1,z2,...,zN
@@ -52,7 +44,7 @@ Primary analysis
 
 Example
 -------
-python autoencoder_initialization_robustness.py \
+python code/autoencoder_initialization_robustness.py \
     --base_dir runs/seed_42/reviewer1 \
     --seeds 1 2 3 4 5 \
     --reference_seed 1 \
@@ -133,60 +125,48 @@ def spearman_r(a: np.ndarray, b: np.ndarray) -> float:
     return pearson_r(rankdata_average(a), rankdata_average(b))
 
 
-def run_sort_key(label: str):
-    """Sort Original first, followed by Seed 1, Seed 2, ..."""
-    if label == "Original":
-        return (0, 0)
-    if label.startswith("Seed "):
-        try:
-            return (1, int(label.split()[-1]))
-        except ValueError:
-            pass
-    return (2, label)
-
-
-def validate_common_steps(frames: Dict[str, pd.DataFrame]) -> Tuple[np.ndarray, List[str]]:
-    """Ensure all runs contain identical time points and latent dimensionality."""
-    labels = sorted(frames, key=run_sort_key)
-    ref = frames[labels[0]]
+def validate_common_steps(frames: Dict[int, pd.DataFrame]) -> Tuple[np.ndarray, List[str]]:
+    """Ensure all seeds contain identical time points and latent dimensionality."""
+    seeds = sorted(frames)
+    ref = frames[seeds[0]]
     steps = ref["step"].to_numpy()
     zcols = latent_columns(ref)
 
-    for label in labels[1:]:
-        df = frames[label]
+    for seed in seeds[1:]:
+        df = frames[seed]
         if not np.array_equal(df["step"].to_numpy(), steps):
             raise ValueError(
-                f"Run {label} has different time points from run {labels[0]}."
+                f"Seed {seed} has different time points from seed {seeds[0]}."
             )
         if latent_columns(df) != zcols:
             raise ValueError(
-                f"Run {label} has different latent columns from run {labels[0]}."
+                f"Seed {seed} has different latent columns from seed {seeds[0]}."
             )
     return steps, zcols
 
 
 def geometry_correlations(
-    frames: Dict[str, pd.DataFrame], model_type: str
+    frames: Dict[int, pd.DataFrame], model_type: str
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Pairwise correlations between complete latent-space distance geometries."""
     _, zcols = validate_common_steps(frames)
-    distance_vectors: Dict[str, np.ndarray] = {}
-    for label, df in frames.items():
+    distance_vectors: Dict[int, np.ndarray] = {}
+    for seed, df in frames.items():
         x = df[zcols].to_numpy(dtype=float)
-        distance_vectors[label] = upper_triangle_values(pairwise_euclidean(x))
+        distance_vectors[seed] = upper_triangle_values(pairwise_euclidean(x))
 
     rows = []
-    labels = sorted(frames, key=run_sort_key)
-    matrix = pd.DataFrame(np.eye(len(labels)), index=labels, columns=labels, dtype=float)
+    seeds = sorted(frames)
+    matrix = pd.DataFrame(np.eye(len(seeds)), index=seeds, columns=seeds, dtype=float)
 
-    for a, b in combinations(labels, 2):
+    for a, b in combinations(seeds, 2):
         r = pearson_r(distance_vectors[a], distance_vectors[b])
         rho = spearman_r(distance_vectors[a], distance_vectors[b])
         rows.append(
             {
                 "model_type": model_type,
-                "run_i": a,
-                "run_j": b,
+                "seed_i": a,
+                "seed_j": b,
                 "geometry_pearson_r": r,
                 "geometry_spearman_rho": rho,
             }
@@ -197,12 +177,12 @@ def geometry_correlations(
     return pd.DataFrame(rows), matrix
 
 
-def temporal_metrics(frames: Dict[str, pd.DataFrame], model_type: str) -> pd.DataFrame:
+def temporal_metrics(frames: Dict[int, pd.DataFrame], model_type: str) -> pd.DataFrame:
     """Quantify local temporal continuity in the complete latent space."""
     steps, zcols = validate_common_steps(frames)
     rows = []
 
-    for label, df in sorted(frames.items(), key=lambda kv: run_sort_key(kv[0])):
+    for seed, df in sorted(frames.items()):
         x = df[zcols].to_numpy(dtype=float)
         d = pairwise_euclidean(x)
 
@@ -221,7 +201,7 @@ def temporal_metrics(frames: Dict[str, pd.DataFrame], model_type: str) -> pd.Dat
         rows.append(
             {
                 "model_type": model_type,
-                "run_label": label,
+                "model_seed": seed,
                 "n_timepoints": len(x),
                 "mean_adjacent_distance": mean_adj,
                 "mean_nonadjacent_distance": mean_nonadj,
@@ -265,32 +245,32 @@ def orthogonal_procrustes_align(x: np.ndarray, reference: np.ndarray):
 
 
 def procrustes_analysis(
-    frames: Dict[str, pd.DataFrame], model_type: str, reference_label: str
-) -> Tuple[pd.DataFrame, Dict[str, np.ndarray], np.ndarray, np.ndarray]:
-    """Align every run to a chosen reference run in the full latent space."""
+    frames: Dict[int, pd.DataFrame], model_type: str, reference_seed: int
+) -> Tuple[pd.DataFrame, Dict[int, np.ndarray], np.ndarray, np.ndarray]:
+    """Align every seed to a chosen reference seed in the full latent space."""
     steps, zcols = validate_common_steps(frames)
-    if reference_label not in frames:
-        raise ValueError(f"Reference run {reference_label} is missing for {model_type}.")
+    if reference_seed not in frames:
+        raise ValueError(f"Reference seed {reference_seed} is missing for {model_type}.")
 
-    reference = frames[reference_label][zcols].to_numpy(dtype=float)
-    aligned: Dict[str, np.ndarray] = {}
+    reference = frames[reference_seed][zcols].to_numpy(dtype=float)
+    aligned: Dict[int, np.ndarray] = {}
     rows = []
 
-    for label, df in sorted(frames.items(), key=lambda kv: run_sort_key(kv[0])):
+    for seed, df in sorted(frames.items()):
         x = df[zcols].to_numpy(dtype=float)
-        if label == reference_label:
+        if seed == reference_seed:
             a = reference.copy()
             error = 0.0
             rotation = np.eye(reference.shape[1])
         else:
             a, rotation, error = orthogonal_procrustes_align(x, reference)
-        aligned[label] = a
+        aligned[seed] = a
 
         rows.append(
             {
                 "model_type": model_type,
-                "run_label": label,
-                "reference_run": reference_label,
+                "model_seed": seed,
+                "reference_seed": reference_seed,
                 "relative_procrustes_error": error,
                 "det_rotation": float(np.linalg.det(rotation)),
             }
@@ -305,13 +285,13 @@ def procrustes_analysis(
 
 
 def project_aligned_to_reference_pca(
-    aligned: Dict[str, np.ndarray], reference_label: str, basis_2d: np.ndarray
-) -> Dict[str, np.ndarray]:
+    aligned: Dict[int, np.ndarray], reference_seed: int, basis_2d: np.ndarray
+) -> Dict[int, np.ndarray]:
     """Project all aligned trajectories into the same reference-defined 2D basis."""
-    ref_mean = aligned[reference_label].mean(axis=0, keepdims=True)
+    ref_mean = aligned[reference_seed].mean(axis=0, keepdims=True)
     return {
-        label: (coords - ref_mean) @ basis_2d
-        for label, coords in aligned.items()
+        seed: (coords - ref_mean) @ basis_2d
+        for seed, coords in aligned.items()
     }
 
 
@@ -320,8 +300,8 @@ def plot_geometry_heatmap(matrix: pd.DataFrame, title: str, outfile: Path) -> No
     im = ax.imshow(matrix.to_numpy(dtype=float), vmin=0.0, vmax=1.0, aspect="equal")
     ax.set_xticks(range(len(matrix.columns)), labels=[str(x) for x in matrix.columns])
     ax.set_yticks(range(len(matrix.index)), labels=[str(x) for x in matrix.index])
-    ax.set_xlabel("Autoencoder realization")
-    ax.set_ylabel("Autoencoder realization")
+    ax.set_xlabel("Model seed")
+    ax.set_ylabel("Model seed")
     ax.set_title(title)
 
     for i in range(len(matrix.index)):
@@ -336,21 +316,21 @@ def plot_geometry_heatmap(matrix: pd.DataFrame, title: str, outfile: Path) -> No
 
 
 def plot_aligned_trajectories(
-    projected: Dict[str, np.ndarray],
+    projected: Dict[int, np.ndarray],
     steps: np.ndarray,
-    reference_label: str,
+    reference_seed: int,
     title: str,
     outfile: Path,
 ) -> None:
     fig, ax = plt.subplots(figsize=(7.0, 6.0))
 
-    for run_label in sorted(projected, key=run_sort_key):
-        xy = projected[run_label]
-        legend_label = run_label + (" (reference)" if run_label == reference_label else "")
-        ax.plot(xy[:, 0], xy[:, 1], marker="o", markersize=3, linewidth=1.5, label=legend_label)
+    for seed in sorted(projected):
+        xy = projected[seed]
+        label = f"seed {seed}" + (" (reference)" if seed == reference_seed else "")
+        ax.plot(xy[:, 0], xy[:, 1], marker="o", markersize=3, linewidth=1.5, label=label)
 
     # Label temporal endpoints only, keeping the plot readable.
-    ref_xy = projected[reference_label]
+    ref_xy = projected[reference_seed]
     ax.annotate(str(steps[0]), (ref_xy[0, 0], ref_xy[0, 1]), xytext=(4, 4), textcoords="offset points")
     ax.annotate(str(steps[-1]), (ref_xy[-1, 0], ref_xy[-1, 1]), xytext=(4, 4), textcoords="offset points")
 
@@ -374,13 +354,13 @@ def build_summary(
         t = temporal[temporal["model_type"] == model_type]
         p = procrustes[
             (procrustes["model_type"] == model_type)
-            & (procrustes["run_label"] != procrustes["reference_run"])
+            & (procrustes["model_seed"] != procrustes["reference_seed"])
         ]
 
         rows.append(
             {
                 "model_type": model_type,
-                "n_realizations": int(t["run_label"].nunique()),
+                "n_initializations": int(t["model_seed"].nunique()),
                 "mean_geometry_pearson_r": g["geometry_pearson_r"].mean(),
                 "min_geometry_pearson_r": g["geometry_pearson_r"].min(),
                 "max_geometry_pearson_r": g["geometry_pearson_r"].max(),
@@ -399,33 +379,24 @@ def build_summary(
     return pd.DataFrame(rows)
 
 
-def load_model_group(
-    base_dir: Path, prefix: str, seeds: Iterable[int], include_original: bool = True
-) -> Dict[str, pd.DataFrame]:
-    """Load Original (when requested) plus controlled Seed N trajectories."""
-    frames: Dict[str, pd.DataFrame] = {}
-
-    if include_original:
-        original_path = base_dir / f"{prefix}_original" / "latents.csv"
-        frames["Original"] = load_latents(original_path)
-
+def load_model_group(base_dir: Path, prefix: str, seeds: Iterable[int]) -> Dict[int, pd.DataFrame]:
+    frames = {}
     for seed in seeds:
         path = base_dir / f"{prefix}_seed_{seed}" / "latents.csv"
-        frames[f"Seed {int(seed)}"] = load_latents(path)
-
+        frames[int(seed)] = load_latents(path)
     validate_common_steps(frames)
     return frames
 
 
 def parse_args():
     p = argparse.ArgumentParser(
-        description="Quantify robustness of Evoscope autoencoder latent trajectories to independent model initialization, including the historical Figure 5 realization."
+        description="Quantify robustness of Evoscope autoencoder latent trajectories to independent model initialization."
     )
     p.add_argument(
         "--base_dir",
         type=Path,
         required=True,
-        help="Directory containing *_original/ and *_seed_N/ folders.",
+        help="Directory containing global_seed_N/ and cluster_seed_N/ folders.",
     )
     p.add_argument(
         "--seeds",
@@ -438,12 +409,7 @@ def parse_args():
         "--reference_seed",
         type=int,
         default=1,
-        help="Controlled Seed N used only as the Procrustes coordinate reference (default: 1).",
-    )
-    p.add_argument(
-        "--exclude_original",
-        action="store_true",
-        help="Exclude *_original/ trajectories. By default Original is included.",
+        help="Reference initialization for orthogonal Procrustes alignment (default: 1).",
     )
     p.add_argument(
         "--outdir",
@@ -458,12 +424,9 @@ def main() -> None:
     args = parse_args()
     args.outdir.mkdir(parents=True, exist_ok=True)
 
-    include_original = not args.exclude_original
-    reference_label = f"Seed {args.reference_seed}"
-
     groups = {
-        "global": load_model_group(args.base_dir, "global", args.seeds, include_original),
-        "cluster": load_model_group(args.base_dir, "cluster", args.seeds, include_original),
+        "global": load_model_group(args.base_dir, "global", args.seeds),
+        "cluster": load_model_group(args.base_dir, "cluster", args.seeds),
     }
 
     all_geometry = []
@@ -474,10 +437,10 @@ def main() -> None:
         geometry_pairs, geometry_matrix = geometry_correlations(frames, model_type)
         temporal = temporal_metrics(frames, model_type)
         procrustes, aligned, steps, basis_2d = procrustes_analysis(
-            frames, model_type, reference_label
+            frames, model_type, args.reference_seed
         )
         projected = project_aligned_to_reference_pca(
-            aligned, reference_label, basis_2d
+            aligned, args.reference_seed, basis_2d
         )
 
         geometry_pairs.to_csv(
@@ -501,19 +464,19 @@ def main() -> None:
         plot_aligned_trajectories(
             projected,
             steps,
-            reference_label,
+            args.reference_seed,
             title=f"{model_type.capitalize()} AE: Procrustes-aligned latent trajectories",
             outfile=args.outdir / f"{model_type}_procrustes_aligned_trajectories.png",
         )
 
         # Export aligned coordinates in the common 2D reference-PCA space.
         projected_rows = []
-        for run_label, xy in sorted(projected.items(), key=lambda kv: run_sort_key(kv[0])):
+        for seed, xy in sorted(projected.items()):
             for step, (pc1, pc2) in zip(steps, xy):
                 projected_rows.append(
                     {
                         "model_type": model_type,
-                        "run_label": run_label,
+                        "model_seed": seed,
                         "step": step,
                         "reference_pc1": pc1,
                         "reference_pc2": pc2,
@@ -543,9 +506,8 @@ def main() -> None:
     with open(args.outdir / "robustness_summary.txt", "w", encoding="utf-8") as fh:
         fh.write("Evoscope autoencoder initialization robustness\n")
         fh.write("============================================\n\n")
-        fh.write(f"Controlled model seeds: {', '.join(map(str, args.seeds))}\n")
-        fh.write(f"Original Figure 5 realization included: {include_original}\n")
-        fh.write(f"Procrustes reference run: {reference_label}\n\n")
+        fh.write(f"Model seeds: {', '.join(map(str, args.seeds))}\n")
+        fh.write(f"Procrustes reference seed: {args.reference_seed}\n\n")
         for _, row in summary.iterrows():
             fh.write(f"[{row['model_type']}]\n")
             fh.write(
