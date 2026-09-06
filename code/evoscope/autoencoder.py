@@ -22,7 +22,9 @@ Organization: Lunan Foldomics LLC
 from __future__ import annotations
 
 import argparse
+import json
 import os
+import random
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -209,9 +211,19 @@ def make_train_val_loaders(
     dataset: Dataset,
     batch_size: int = 16,
     val_fraction: float = 0.2,
-    seed: int = 11,
+    split_seed: int = 11,
+    loader_seed: int = 11,
 ) -> Tuple[DataLoader, DataLoader]:
-    """Split a dataset and return train/validation loaders."""
+    """Split a dataset and return reproducible train/validation loaders.
+
+    Parameters
+    ----------
+    split_seed:
+        Controls which samples are assigned to train vs validation.
+    loader_seed:
+        Controls the randomized order of training batches. Keeping this fixed
+        allows model initialization to be varied independently.
+    """
 
     n_total = len(dataset)
     n_val = max(1, int(n_total * val_fraction))
@@ -222,10 +234,16 @@ def make_train_val_loaders(
     train_set, val_set = random_split(
         dataset,
         [n_train, n_val],
-        generator=torch.Generator().manual_seed(seed),
+        generator=torch.Generator().manual_seed(split_seed),
     )
 
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    train_generator = torch.Generator().manual_seed(loader_seed)
+    train_loader = DataLoader(
+        train_set,
+        batch_size=batch_size,
+        shuffle=True,
+        generator=train_generator,
+    )
     val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=False)
     return train_loader, val_loader
 
@@ -239,7 +257,10 @@ def train_autoencoder(
     recon_weight: float = 1.0,
     gene_weight: float = 1.0,
     val_fraction: float = 0.2,
-    seed: int = 11,
+    seed: Optional[int] = 11,
+    model_seed: Optional[int] = None,
+    split_seed: Optional[int] = None,
+    loader_seed: Optional[int] = None,
     outdir: Optional[PathLike] = None,
     device: Optional[str] = None,
     patience: int = 20,
@@ -255,15 +276,27 @@ def train_autoencoder(
         Training history as a dataframe.
     """
 
-    torch.manual_seed(seed)
-    np.random.seed(seed)
+    # Backward-compatible seed handling:
+    # --seed acts as the legacy master seed unless explicit seeds are supplied.
+    master_seed = 11 if seed is None else int(seed)
+    model_seed = master_seed if model_seed is None else int(model_seed)
+    split_seed = master_seed if split_seed is None else int(split_seed)
+    loader_seed = split_seed if loader_seed is None else int(loader_seed)
+
+    # Model initialization / stochastic neural-network operations.
+    random.seed(model_seed)
+    np.random.seed(model_seed)
+    torch.manual_seed(model_seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(model_seed)
 
     device = resolve_device(device)
     train_loader, val_loader = make_train_val_loaders(
         dataset=dataset,
         batch_size=batch_size,
         val_fraction=val_fraction,
-        seed=seed,
+        split_seed=split_seed,
+        loader_seed=loader_seed,
     )
 
     model = ConvAutoencoder(
@@ -324,6 +357,25 @@ def train_autoencoder(
         out_path.mkdir(parents=True, exist_ok=True)
         torch.save(model.state_dict(), out_path / "torex_autoencoder.pt")
         history.to_csv(out_path / "training_history.csv", index=False)
+
+        reproducibility = {
+            "seed": master_seed,
+            "model_seed": model_seed,
+            "split_seed": split_seed,
+            "loader_seed": loader_seed,
+            "device": device,
+            "latent_dim": latent_dim,
+            "batch_size": batch_size,
+            "epochs_requested": epochs,
+            "learning_rate": lr,
+            "recon_weight": recon_weight,
+            "gene_weight": gene_weight,
+            "val_fraction": val_fraction,
+            "patience": patience,
+        }
+        with open(out_path / "reproducibility.json", "w", encoding="utf-8") as fh:
+            json.dump(reproducibility, fh, indent=2)
+
         export_latents(model, dataset, out_path / "latents.csv", device=device)
         export_predictions(
             model,
@@ -370,7 +422,33 @@ def parse_args():
     p.add_argument("--recon_weight", type=float, default=1.0)
     p.add_argument("--gene_weight", type=float, default=1.0)
     p.add_argument("--val_fraction", type=float, default=0.2)
-    p.add_argument("--seed", type=int, default=11)
+    p.add_argument(
+        "--seed",
+        type=int,
+        default=11,
+        help=(
+            "Legacy master seed. Used for model, split, and loader seeds unless "
+            "the corresponding explicit options are supplied."
+        ),
+    )
+    p.add_argument(
+        "--model_seed",
+        type=int,
+        default=None,
+        help="Seed for autoencoder weight initialization and model stochasticity.",
+    )
+    p.add_argument(
+        "--split_seed",
+        type=int,
+        default=None,
+        help="Seed controlling the train/validation split.",
+    )
+    p.add_argument(
+        "--loader_seed",
+        type=int,
+        default=None,
+        help="Seed controlling shuffled training-batch order.",
+    )
     p.add_argument("--outdir", type=str, default="ae_outputs")
     p.add_argument("--device", type=str, default=None)
     p.add_argument("--patience", type=int, default=20)
@@ -392,6 +470,9 @@ def main() -> None:
         gene_weight=args.gene_weight,
         val_fraction=args.val_fraction,
         seed=args.seed,
+        model_seed=args.model_seed,
+        split_seed=args.split_seed,
+        loader_seed=args.loader_seed,
         outdir=args.outdir,
         device=args.device,
         patience=args.patience,
