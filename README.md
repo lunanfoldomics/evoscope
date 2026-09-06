@@ -325,7 +325,7 @@ Figure 5 of the associated manuscript (see citation below) illustrates the tempo
 The figure compares the latent trajectories obtained from the global-target and cluster-resolved autoencoders.
 
 
-![Temporal organization of morphology-derived latent representations](images/Figure5.png)
+![Temporal organization of morphology-derived latent representations](images/figure5.png)
 
 The manuscript Figure 5 can be regenerated directly from the corresponding autoencoder latent outputs:
 
