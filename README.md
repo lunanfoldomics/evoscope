@@ -2,7 +2,7 @@
 
 # Evoscope
 
-**Evoscope v0.9.2**  
+**Evoscope v0.9.3**  
 *A minimal regulatory spatial model for emergent multicellular organization.*
 
 **Author:** Luca Zammataro  
