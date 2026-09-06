@@ -409,6 +409,11 @@ The script generates pairwise geometry-correlation tables, temporal-neighborhood
 The purpose of this analysis is not to demonstrate that independently trained autoencoders recover identical latent coordinates, but rather to test whether they preserve a common relational organization of the morphology-derived temporal states.
 
 
+![Autoencoder initialization robustness.](images/autoencoder_initialization_robustness.png)
+A copy of Supplementary Figure 11 from the associated manuscript is provided here for convenience. The underlying latent trajectories, quantitative outputs, and analysis script used to generate this figure are included in the accompanying robustness-analysis directory.
+
+---
+
 ## Status
 
 This project is currently under active development.
