@@ -105,7 +105,6 @@ This makes Evoscope relevant both to theoretical biology and to the development 
 The repository is organized around the `code/` directory, which contains both the installable Evoscope package and the standalone workflow scripts used in the manuscript analyses.
 
 - `code/evoscope/` — installable Python package containing the core simulation framework, command-line interface, data exporters, autoencoder utilities, latent-space analysis, correlation analysis, plotting, and visualization modules.
-- `code/torhex_autoencoder.py` — standalone autoencoder workflow script used for global and cluster-resolved morphology-to-regulation analyses.
 - `code/correlation_global_or_cluster_latents_and_genes.py` — standalone workflow script for latent–observable correlation analysis.
 - `code/aggregate_evoscope.py` — standalone workflow script for aggregating simulation outputs across runs.
 - `code/viewer.py` — interactive viewer for inspecting simulation snapshots.
@@ -256,7 +255,7 @@ Evoscope supports two autoencoder workflows for latent-variable discovery:
 ### Global-gene mode
 
 ```bash
-python code/torhex_autoencoder.py  \
+python -m evoscope.autoencoder \
 	--snapshots_dir runs/seed_42/snapshots \
 	--global_csv runs/seed_42/global_genes.csv  \
 	--target_mode global \
@@ -267,7 +266,7 @@ python code/torhex_autoencoder.py  \
 ### Cluster-gene mode
 
 ```bash
-python code/torhex_autoencoder.py  \
+python -m evoscope.autoencoder  \
 	--snapshots_dir runs/seed_42/snapshots \
 	--cluster_csv runs/seed_42/cluster_genes.csv \
 	--target_mode cluster_flat \
