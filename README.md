@@ -410,7 +410,7 @@ The purpose of this analysis is not to demonstrate that independently trained au
 
 
 ![Autoencoder initialization robustness.](images/autoencoder_initialization_robustness.png)
-A copy of Supplementary Figure 11 from the associated manuscript is provided here for convenience. The underlying latent trajectories, quantitative outputs, and analysis script used to generate this figure are included in the accompanying robustness-analysis directory.
+
 
 ---
 
