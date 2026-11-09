@@ -462,7 +462,7 @@ The scripts used for the representation-control analyses added during revision a
 
 ---
 
-## Preprint and citation
+## Citation
 
 If you use this code, please cite:
 
