@@ -466,24 +466,21 @@ The scripts used for the representation-control analyses added during revision a
 
 If you use this code, please cite:
 
-*A Minimal Regulatory Spatial Model for Emergent Multicellular Organization in Dissipative Environments*
-
-Luca Zammataro
-
-bioRxiv 2026.04.24.720740; doi: https://doi.org/10.64898/2026.04.24.720740
+Zammataro, L. A minimal regulatory spatial model for emergent multicellular organization in dissipative environments. npj Syst Biol Appl (2026). https://doi.org/10.1038/s41540-026-00839-4
 
 ```Text
-@article {Zammataro2026.04.24.720740,
-	author = {Zammataro, Luca},
-	title = {A Minimal Regulatory Spatial Model for Emergent Multicellular Organization in Dissipative Environments},
-	elocation-id = {2026.04.24.720740},
-	year = {2026},
-	doi = {10.64898/2026.04.24.720740},
-	publisher = {Cold Spring Harbor Laboratory},
-	URL = {https://www.biorxiv.org/content/early/2026/05/04/2026.04.24.720740},
-	eprint = {https://www.biorxiv.org/content/early/2026/05/04/2026.04.24.720740.full.pdf},
-	journal = {bioRxiv}
-}
+TY  - JOUR
+AU  - Zammataro, Luca
+PY  - 2026
+DA  - 2026/10/22
+TI  - A minimal regulatory spatial model for emergent multicellular organization in dissipative environments
+JO  - npj Systems Biology and Applications
+AB  - How multicellular organization emerges from minimal regulatory principles remains a central question in theoretical biology. Here we introduce Evoscope, a spatial computational framework in which tissue-like organization arises from a compact regulatory grammar governing nutrient uptake, adhesion, motility, competition, protection, and identity commitment. The model generates diverse multicellular morphologies within a dissipative environment while maintaining complete access to the underlying regulatory state. To investigate whether visible morphology retains information about hidden regulation, we trained convolutional autoencoders with supervised prediction heads on simulation snapshots. The resulting morphology-derived latent representations captured structured information associated with the internal regulatory programs and enabled partial inference of regulatory variables from morphology alone. Additional held-out seed analyses, baseline comparisons, and temporal persistence controls showed that the learned representations retain predictive information beyond coarse population descriptors while accounting for short-horizon temporal autocorrelation. Evoscope therefore provides a controlled proof of concept that representation learning can recover informative mesoscopic latent variables linking morphology and regulation in a synthetic multicellular system, supporting future applications to spatially resolved biological data.
+SN  - 2056-7189
+UR  - https://doi.org/10.1038/s41540-026-00839-4
+DO  - 10.1038/s41540-026-00839-4
+ID  - Zammataro2026
+ER  - 
 ```
 
 ## License
